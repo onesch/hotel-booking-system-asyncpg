@@ -8,3 +8,10 @@ dependencies = [
     "fastapi>=0.140.13",
     "uvicorn>=0.52.0",
 ]
+
+[dependency-groups]
+dev = [
+    "black>=26.5.1",
+    "flake8>=7.3.0",
+    "sqlfluff>=4.2.2",
+]
