@@ -39,3 +39,21 @@ CREATE TABLE IF NOT EXISTS Rooms (
         REFERENCES Room_Types(id)
         ON DELETE RESTRICT
 );
+
+CREATE TABLE if not exists Bookings (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    guest_id INTEGER NOT NULL,
+    room_id INTEGER NOT NULL,
+    check_in_date DATE NOT NULL,
+    check_out_date DATE NOT NULL,
+
+    CONSTRAINT fk_guest
+        FOREIGN KEY (guest_id)
+        REFERENCES Guests(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_room
+        FOREIGN KEY (room_id)
+        REFERENCES Rooms(id)
+        ON DELETE CASCADE
+);
