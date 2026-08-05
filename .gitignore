@@ -4,3 +4,6 @@ __pycache__/
 # Virtual environments
 .venv
 .env
+
+# Dev
+TODO.md

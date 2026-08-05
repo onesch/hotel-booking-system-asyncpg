@@ -29,5 +29,5 @@ psql -U <username> -d hotel_booking_system -f app/db_services/faker_values.sql
 #### 5. Run the application
 
 ```bash
-uv run python app/main.py
+make dev
 ```
