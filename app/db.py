@@ -1,4 +1,5 @@
 import asyncpg
+from typing import Any
 
 from app.settings import DATABASE_URL
 
@@ -49,7 +50,7 @@ class Database:
         self,
         query: str,
         *args,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """
         Execute SELECT query and return multiple rows.
         """
@@ -57,7 +58,10 @@ class Database:
 
         try:
             result = await conn.fetch(query, *args)
-            return result
+            return [
+                dict(row)
+                for row in result
+            ]
 
         finally:
             await self.close_connection(conn)
