@@ -36,7 +36,7 @@ async def get_guest_by_id(
 
 
 @router.get("/", response_model=list[GuestResponse])
-async def read_guests():
+async def get_guests():
     """
     Get all guests.
     """
