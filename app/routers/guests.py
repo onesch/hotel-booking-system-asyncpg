@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter
 
-from app.services.guests import GuestsServices
+from app.services.guests import GuestService
 from app.schemas.guests import (
     GuestCreate,
     GuestResponse,
@@ -12,7 +12,7 @@ from app.schemas.guests import (
 
 router = APIRouter(tags=["guests"])
 
-guests_service = GuestsServices()
+guests_service = GuestService()
 
 
 @router.post("/create")

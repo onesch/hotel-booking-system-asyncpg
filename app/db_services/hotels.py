@@ -1,7 +1,7 @@
 from app.db import Database
 
 
-class Hotels():
+class HotelRepository():
     """
     Class for managing hotels in the databse.
     """

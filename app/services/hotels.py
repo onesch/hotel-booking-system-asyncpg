@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from app.db_services.hotels import Hotels
+from app.db_services.hotels import HotelRepository
 from app.schemas.hotels import (
     HotelCreate,
     HotelDelete,
@@ -8,13 +8,13 @@ from app.schemas.hotels import (
 )
 
 
-class HotelsServices:
+class HotelService:
     """
     Service class for managing hotels.
     """
 
     def __init__(self):
-        self.repo = Hotels()
+        self.repo = HotelRepository()
 
     async def create(
         self,

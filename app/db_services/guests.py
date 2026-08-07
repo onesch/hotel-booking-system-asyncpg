@@ -3,7 +3,7 @@ from fastapi import HTTPException
 
 from app.db import Database
 
-class Guests():
+class GuestRepository():
     """
     Class for managing guests in the database.
     """

@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter
 
-from app.services.hotels import HotelsServices
+from app.services.hotels import HotelService
 from app.schemas.hotels import (
     HotelCreate,
     HotelResponse,
@@ -12,7 +12,7 @@ from app.schemas.hotels import (
 
 router = APIRouter(tags=["hotels"])
 
-hotels_service = HotelsServices()
+hotels_service = HotelService()
 
 
 @router.post("/create")

@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from app.db_services.guests import Guests
+from app.db_services.guests import GuestRepository
 from app.schemas.guests import (
     GuestCreate,
     GuestDelete,
@@ -8,13 +8,13 @@ from app.schemas.guests import (
 )
 
 
-class GuestsServices():
+class GuestService():
     """
     Service class for managing guests.
     """
 
     def __init__(self):
-        self.repo = Guests()
+        self.repo = GuestRepository()
 
     async def create(
         self,
