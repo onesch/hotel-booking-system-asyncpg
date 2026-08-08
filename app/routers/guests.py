@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter
 
 from app.services.guests import GuestService
