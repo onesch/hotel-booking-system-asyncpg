@@ -109,7 +109,8 @@ class GuestRepository():
         id: int,
     ):
         query = """
-            DELETE FROM guests WHERE id = $1;
+            DELETE FROM guests
+            WHERE id = $1
+            RETURNING *;
         """
-        guest = await self.db.execute(query, id)
-        return guest
+        return await self.db.fetchrow(query, id)

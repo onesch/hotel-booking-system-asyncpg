@@ -24,7 +24,6 @@ class HotelRepository():
             VALUES ($1, $2, $3)
             RETURNING *;
         """
-
         return await self.db.fetchrow(
             query,
             name,
@@ -46,7 +45,6 @@ class HotelRepository():
             FROM hotels
             WHERE id = $1;
         """
-
         return await self.db.fetchrow(
             query,
             hotel_id,
@@ -64,7 +62,6 @@ class HotelRepository():
                 created_at
             FROM hotels;
         """
-
         return await self.db.fetch(query)
 
     async def update(
@@ -83,13 +80,8 @@ class HotelRepository():
             WHERE id = $1
             RETURNING *;
         """
-
         return await self.db.fetchrow(
-            query,
-            id,
-            name,
-            address,
-            description,
+            query, id, name, address, description,
         )
 
     async def delete(
@@ -98,10 +90,7 @@ class HotelRepository():
     ) -> None:
         query = """
             DELETE FROM hotels
-            WHERE id = $1;
+            WHERE id = $1
+            RETURNING *;
         """
-
-        await self.db.execute(
-            query,
-            id,
-        )
+        return await self.db.fetchrow(query, id)
