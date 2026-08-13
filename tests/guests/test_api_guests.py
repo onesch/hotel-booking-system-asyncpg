@@ -51,6 +51,7 @@ async def test_create_guest(api_guest_service, guest_data, monkeypatch):
 async def test_get_guest_by_id(api_guest_service, guest_data, monkeypatch):
     guest = {
         **guest_data,
+        "role": "user",
         "created_at": "2026-08-05T12:00:00",
     }
 
@@ -73,9 +74,7 @@ async def test_get_guest_by_id(api_guest_service, guest_data, monkeypatch):
     assert response.status_code == 200
     assert response.json() == guest
 
-    api_guest_service.get_by_id.assert_awaited_once_with(
-        guest_data["id"]
-    )
+    api_guest_service.get_by_id.assert_awaited_once_with(guest_data["id"])
 
 
 @pytest.mark.asyncio
@@ -107,6 +106,7 @@ async def test_get_guest_by_id_not_found(api_guest_service, monkeypatch):
 async def test_get_all_guests(api_guest_service, guest_data, monkeypatch):
     guest = {
         **guest_data,
+        "role": "user",
         "created_at": "2026-08-05T12:00:00",
     }
 
@@ -150,6 +150,7 @@ async def test_update_guest(api_guest_service, guest_data, monkeypatch):
         "last_name": None,
         "email": None,
         "phone": None,
+        "role": None,
     }
 
     async with AsyncClient(
@@ -174,6 +175,7 @@ async def test_update_guest(api_guest_service, guest_data, monkeypatch):
     assert guest.last_name is None
     assert guest.email is None
     assert guest.phone is None
+    assert guest.role is None
 
 
 @pytest.mark.asyncio
@@ -194,6 +196,7 @@ async def test_update_guest_not_found(api_guest_service, monkeypatch):
         "last_name": None,
         "email": None,
         "phone": None,
+        "role": None,
     }
 
     async with AsyncClient(

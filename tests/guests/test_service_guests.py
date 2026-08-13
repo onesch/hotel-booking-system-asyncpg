@@ -85,6 +85,7 @@ async def test_update_guest(guest_service, guest_data):
         last_name=None,
         email=None,
         phone=None,
+        role=None,
     )
 
     result = await guest_service.update(guest)
@@ -97,6 +98,7 @@ async def test_update_guest(guest_service, guest_data):
         last_name=None,
         email=None,
         phone=None,
+        role=None,
     )
 
 
@@ -110,6 +112,7 @@ async def test_update_guest_not_found(guest_service):
         last_name=None,
         email=None,
         phone=None,
+        role=None,
     )
 
     with pytest.raises(HTTPException) as exc:
@@ -124,6 +127,7 @@ async def test_update_guest_not_found(guest_service):
         last_name=None,
         email=None,
         phone=None,
+        role=None,
     )
 
 

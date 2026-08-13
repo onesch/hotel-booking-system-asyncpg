@@ -47,6 +47,7 @@ class GuestRepository():
                 last_name,
                 email,
                 phone,
+                role,
                 created_at
             FROM guests
             WHERE id = $1;
@@ -66,6 +67,7 @@ class GuestRepository():
                 last_name,
                 email,
                 phone,
+                role,
                 created_at
             FROM guests;
         """
@@ -82,6 +84,7 @@ class GuestRepository():
         last_name: str | None,
         email: str | None,
         phone: str | None,
+        role: str | None,
     ) -> dict | None:
         query = """
             UPDATE guests
@@ -89,13 +92,14 @@ class GuestRepository():
                 first_name = COALESCE($2, first_name),
                 last_name = COALESCE($3, last_name),
                 email = COALESCE($4, email),
-                phone = COALESCE($5, phone)
+                phone = COALESCE($5, phone),
+                role = COALESCE($6, role)
             WHERE id = $1
             RETURNING *;
         """
         try:
             guest = await self.db.fetchrow(
-                query, id, first_name, last_name, email, phone,
+                query, id, first_name, last_name, email, phone, role,
             )
             return guest
         except asyncpg.exceptions.UniqueViolationError:

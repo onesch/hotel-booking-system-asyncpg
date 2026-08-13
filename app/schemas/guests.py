@@ -8,6 +8,7 @@ class GuestResponse(BaseModel):
     last_name: str
     email: EmailStr
     phone: str
+    role: str
     created_at: datetime
 
 
@@ -16,6 +17,7 @@ class GuestCreate(BaseModel):
     last_name: str
     email: EmailStr
     phone: str
+    role: str = "user"
 
 
 class GuestUpdate(BaseModel):
@@ -24,6 +26,7 @@ class GuestUpdate(BaseModel):
     last_name: str | None = None
     email: EmailStr | None = None
     phone: str | None = None
+    role: str | None = None
 
 
 class GuestDelete(BaseModel):
