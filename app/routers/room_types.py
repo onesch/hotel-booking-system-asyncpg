@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from app.dependencies.auth import require_admin
 from app.services.room_types import RoomTypeService
 from app.schemas.room_types import (
     RoomTypeCreate,
@@ -17,9 +18,11 @@ room_types_service = RoomTypeService()
 @router.post("/create")
 async def create_room_type(
     room_type: RoomTypeCreate,
+    current_guest=Depends(require_admin),
 ):
     """
     Create a new room type.
+    Only admin's can access this endpoint.
     """
     return await room_types_service.create(room_type)
 
@@ -45,9 +48,11 @@ async def get_room_types():
 @router.patch("/update")
 async def update_room_type(
     room_type: RoomTypeUpdate,
+    current_guest=Depends(require_admin),
 ):
     """
     Update room type.
+    Only admin's can access this endpoint.
     """
     return await room_types_service.update(room_type)
 
@@ -55,8 +60,10 @@ async def update_room_type(
 @router.delete("/delete")
 async def delete_room_type(
     room_type: RoomTypeDelete,
+    current_guest=Depends(require_admin),
 ):
     """
     Delete room type.
+    Only admin's can access this endpoint.
     """
     return await room_types_service.delete(room_type)

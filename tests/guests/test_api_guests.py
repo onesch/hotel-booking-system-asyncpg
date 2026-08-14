@@ -8,44 +8,6 @@ from app.main import app
 HTTP request -> Router -> mock GuestService
 """
 
-@pytest.mark.asyncio
-async def test_create_guest(api_guest_service, guest_data, monkeypatch):
-    api_guest_service.create.return_value = guest_data
-
-    monkeypatch.setattr(
-        "app.routers.guests.guests_service",
-        api_guest_service,
-    )
-
-    payload = {
-        "first_name": guest_data["first_name"],
-        "last_name": guest_data["last_name"],
-        "email": guest_data["email"],
-        "phone": guest_data["phone"],
-    }
-
-    async with AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url="http://test",
-    ) as client:
-
-        response = await client.post(
-            "/guests/create",
-            json=payload,
-        )
-
-    assert response.status_code == 200
-    assert response.json() == guest_data
-
-    api_guest_service.create.assert_awaited_once()
-
-    guest = api_guest_service.create.call_args.args[0]
-
-    assert guest.first_name == guest_data["first_name"]
-    assert guest.last_name == guest_data["last_name"]
-    assert guest.email == guest_data["email"]
-    assert guest.phone == guest_data["phone"]
-
 
 @pytest.mark.asyncio
 async def test_get_guest_by_id(api_guest_service, guest_data, monkeypatch):

@@ -12,12 +12,12 @@ class GuestResponse(BaseModel):
     created_at: datetime
 
 
-class GuestCreate(BaseModel):
+class GuestRegister(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
     phone: str
-    role: str = "user"
+    password: str
 
 
 class GuestUpdate(BaseModel):

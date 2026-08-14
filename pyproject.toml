@@ -9,6 +9,7 @@ dependencies = [
     "asyncpg>=0.31.0",
     "email-validator>=2.3.0",
     "fastapi>=0.140.13",
+    "passlib>=1.7.4",
     "psycopg2-binary>=2.9.12",
     "pydantic>=2.13.4",
     "pytest-cov>=7.1.0",

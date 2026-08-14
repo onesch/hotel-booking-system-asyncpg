@@ -1,8 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.dependencies.auth import get_current_guest
 from app.services.guests import GuestService
 from app.schemas.guests import (
-    GuestCreate,
     GuestResponse,
     GuestUpdate,
     GuestDelete,
@@ -14,16 +14,6 @@ router = APIRouter(tags=["guests"])
 guests_service = GuestService()
 
 
-@router.post("/create")
-async def create_guest(
-    guest: GuestCreate,
-):
-    """
-    Create a new guest.
-    """
-    return await guests_service.create(guest)
-
-
 @router.get("/{guest_id}", response_model=GuestResponse)
 async def get_guest_by_id(
     guest_id: int,
@@ -32,6 +22,16 @@ async def get_guest_by_id(
     Get guest by id.
     """
     return await guests_service.get_by_id(guest_id)
+
+
+@router.get("/email/{guest_email}", response_model=GuestResponse)
+async def get_guest_by_email(
+    guest_email: str,
+):
+    """
+    Get guest by email.
+    """
+    return await guests_service.get_by_email(guest_email)
 
 
 @router.get("/", response_model=list[GuestResponse])
@@ -45,18 +45,36 @@ async def get_guests():
 @router.patch("/update")
 async def update_guest(
     guest: GuestUpdate,
+    current_guest=Depends(get_current_guest),
 ):
     """
     Update guest.
     """
+    if (
+        current_guest["role"] != "admin"
+        and current_guest["id"] != guest.id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only update yourself",
+        )
     return await guests_service.update(guest)
 
 
 @router.delete("/delete")
 async def delete_guest(
     guest: GuestDelete,
+    current_guest=Depends(get_current_guest),
 ):
     """
     Delete guest.
     """
+    if (
+        current_guest["role"] != "admin"
+        and current_guest["id"] != guest.id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only delete yourself",
+        )
     return await guests_service.delete(guest)

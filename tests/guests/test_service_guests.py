@@ -2,7 +2,6 @@ import pytest
 from fastapi import HTTPException
 
 from app.schemas.guests import (
-    GuestCreate,
     GuestDelete,
     GuestUpdate,
 )
@@ -11,28 +10,6 @@ from app.schemas.guests import (
 Service -> correctly calls the Repository
         -> correctly handles the Repository result
 """
-
-@pytest.mark.asyncio
-async def test_create_guest(guest_service, guest_data):
-    guest_service.repo.create.return_value = guest_data
-
-    guest = GuestCreate(
-        first_name=guest_data["first_name"],
-        last_name=guest_data["last_name"],
-        email=guest_data["email"],
-        phone=guest_data["phone"],
-    )
-
-    result = await guest_service.create(guest)
-
-    assert result == guest_data
-
-    guest_service.repo.create.assert_awaited_once_with(
-        first_name=guest_data["first_name"],
-        last_name=guest_data["last_name"],
-        email=guest_data["email"],
-        phone=guest_data["phone"],
-    )
 
 
 @pytest.mark.asyncio

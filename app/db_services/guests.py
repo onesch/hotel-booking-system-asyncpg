@@ -3,6 +3,7 @@ from fastapi import HTTPException
 
 from app.db import Database
 
+
 class GuestRepository():
     """
     Class for managing guests in the database.
@@ -17,17 +18,18 @@ class GuestRepository():
         last_name: str,
         email: str,
         phone: str,
+        password_hash: str,
     ) -> dict | None:
         query = """
             INSERT INTO guests (
-                first_name, last_name, email, phone
+                first_name, last_name, email, phone, password_hash
             )
-            VALUES ($1, $2, $3, $4)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING *;
         """
         try:
             guest = await self.db.fetchrow(
-                query, first_name, last_name, email, phone,
+                query, first_name, last_name, email, phone, password_hash
             )
             return guest
         except asyncpg.exceptions.UniqueViolationError:
@@ -55,6 +57,16 @@ class GuestRepository():
         return await self.db.fetchrow(
             query,
             guest_id,
+        )
+
+    async def get_by_email(self, email: str):
+        return await self.db.fetchrow(
+            """
+            SELECT *
+            FROM guests
+            WHERE email = $1
+            """,
+            email,
         )
 
     async def get_all(

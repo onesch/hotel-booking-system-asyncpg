@@ -2,7 +2,6 @@ from fastapi import HTTPException
 
 from app.db_services.guests import GuestRepository
 from app.schemas.guests import (
-    GuestCreate,
     GuestDelete,
     GuestUpdate,
 )
@@ -15,20 +14,6 @@ class GuestService():
 
     def __init__(self):
         self.repo = GuestRepository()
-
-    async def create(
-        self,
-        guest: GuestCreate,
-    ) -> dict | None:
-        """
-        Create a new guest.
-        """
-        return await self.repo.create(
-            first_name=guest.first_name,
-            last_name=guest.last_name,
-            email=guest.email,
-            phone=guest.phone,
-        )
 
     async def get_by_id(
         self,
@@ -45,6 +30,12 @@ class GuestService():
                 detail="Guest not found",
             )
         return guest
+
+    async def get_by_email(self, email: str):
+        """
+        Get guest by email.
+        """
+        return await self.repo.get_by_email(email)
 
     async def get_all(self):
         """
