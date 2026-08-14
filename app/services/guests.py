@@ -57,6 +57,7 @@ class GuestService():
             email=guest.email,
             phone=guest.phone,
             role=guest.role,
+            password_hash=guest.password_hash,
         )
 
         if updated_guest is None:

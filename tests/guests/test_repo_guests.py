@@ -6,30 +6,36 @@ Repository -> roper SQL Queries -> PostgreSQL
 
 @pytest.mark.asyncio
 async def test_create_guest(guest_repository, guest_data):
-    guest_repository.db.fetchrow.return_value = guest_data
+    created_guest = {
+        **guest_data,
+        "password_hash": "hashed_password",
+    }
+    guest_repository.db.fetchrow.return_value = created_guest
 
     result = await guest_repository.create(
-        first_name=guest_data["first_name"],
-        last_name=guest_data["last_name"],
-        email=guest_data["email"],
-        phone=guest_data["phone"],
+        first_name=created_guest["first_name"],
+        last_name=created_guest["last_name"],
+        email=created_guest["email"],
+        phone=created_guest["phone"],
+        password_hash=created_guest["password_hash"],
     )
 
-    assert result == guest_data
+    assert result == created_guest
 
     guest_repository.db.fetchrow.assert_awaited_once()
 
     query, *args = guest_repository.db.fetchrow.call_args.args
 
     assert "INSERT INTO guests" in query
-    assert "VALUES ($1, $2, $3, $4)" in query
+    assert "VALUES ($1, $2, $3, $4, $5)" in query
     assert "RETURNING *" in query
 
     assert args == [
-        guest_data["first_name"],
-        guest_data["last_name"],
-        guest_data["email"],
-        guest_data["phone"],
+        created_guest["first_name"],
+        created_guest["last_name"],
+        created_guest["email"],
+        created_guest["phone"],
+        created_guest["password_hash"],
     ]
 
 
@@ -72,6 +78,48 @@ async def test_get_guest_by_id_not_found(guest_repository):
 
 
 @pytest.mark.asyncio
+async def test_get_guest_by_email(guest_repository, guest_data):
+    guest_repository.db.fetchrow.return_value = guest_data
+
+    result = await guest_repository.get_by_email(
+        guest_data["email"]
+    )
+
+    assert result == guest_data
+
+    guest_repository.db.fetchrow.assert_awaited_once()
+
+    query, *args = guest_repository.db.fetchrow.call_args.args
+
+    assert "SELECT" in query
+    assert "FROM guests" in query
+    assert "WHERE email = $1" in query
+
+    assert args == [guest_data["email"]]
+
+
+@pytest.mark.asyncio
+async def test_get_guest_by_email_not_found(guest_repository):
+    guest_repository.db.fetchrow.return_value = None
+
+    result = await guest_repository.get_by_email(
+        "notfound@example.com"
+    )
+
+    assert result is None
+
+    guest_repository.db.fetchrow.assert_awaited_once()
+
+    query, *args = guest_repository.db.fetchrow.call_args.args
+
+    assert "SELECT" in query
+    assert "FROM guests" in query
+    assert "WHERE email = $1" in query
+
+    assert args == ["notfound@example.com"]
+
+
+@pytest.mark.asyncio
 async def test_get_all_guests(guest_repository, guest_data):
     guest_repository.db.fetch.return_value = [guest_data]
 
@@ -103,6 +151,7 @@ async def test_update_guest(guest_repository, guest_data):
         email=None,
         phone=None,
         role=None,
+        password_hash=None,
     )
 
     assert result == updated_guest
@@ -122,6 +171,7 @@ async def test_update_guest(guest_repository, guest_data):
         None,
         None,
         None,
+        None,
     ]
 
 
@@ -136,6 +186,7 @@ async def test_update_guest_not_found(guest_repository):
         email=None,
         phone=None,
         role=None,
+        password_hash=None,
     )
 
     assert result is None
@@ -150,6 +201,7 @@ async def test_update_guest_not_found(guest_repository):
     assert args == [
         999,
         "Name",
+        None,
         None,
         None,
         None,

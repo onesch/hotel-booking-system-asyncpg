@@ -93,7 +93,9 @@ async def test_get_all_guests(api_guest_service, guest_data, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_update_guest(api_guest_service, guest_data, monkeypatch):
+async def test_update_guest(
+    api_guest_service, guest_data, override_current_guest, monkeypatch
+):
     updated_guest = {
         **guest_data,
         "first_name": "Updated",
@@ -141,7 +143,47 @@ async def test_update_guest(api_guest_service, guest_data, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_update_guest_not_found(api_guest_service, monkeypatch):
+async def test_update_guest_forbidden(
+    api_guest_service,
+    override_current_guest,
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        "app.routers.guests.guests_service",
+        api_guest_service,
+    )
+
+    payload = {
+        "id": 999,
+        "first_name": "Updated",
+        "last_name": None,
+        "email": None,
+        "phone": None,
+        "role": None,
+    }
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as client:
+
+        response = await client.patch(
+            "/guests/update",
+            json=payload,
+        )
+
+    assert response.status_code == 403
+    assert response.json() == {
+        "detail": "You can only update yourself"
+    }
+
+    api_guest_service.update.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_update_guest_not_found(
+    api_guest_service, override_admin_guest, monkeypatch
+):
     api_guest_service.update.side_effect = HTTPException(
         status_code=404,
         detail="Guest not found",
@@ -185,7 +227,9 @@ async def test_update_guest_not_found(api_guest_service, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_delete_guest(api_guest_service, guest_data, monkeypatch):
+async def test_delete_guest(
+    api_guest_service, guest_data, override_current_guest, monkeypatch
+):
     api_guest_service.delete.return_value = guest_data
 
     monkeypatch.setattr(
@@ -219,7 +263,43 @@ async def test_delete_guest(api_guest_service, guest_data, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_delete_guest_not_found(api_guest_service, monkeypatch):
+async def test_delete_guest_forbidden(
+    api_guest_service,
+    override_current_guest,
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        "app.routers.guests.guests_service",
+        api_guest_service,
+    )
+
+    payload = {
+        "id": 999,
+    }
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as client:
+
+        response = await client.request(
+            "DELETE",
+            "/guests/delete",
+            json=payload,
+        )
+
+    assert response.status_code == 403
+    assert response.json() == {
+        "detail": "You can only delete yourself"
+    }
+
+    api_guest_service.delete.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_delete_guest_not_found(
+    api_guest_service, override_admin_guest, monkeypatch
+):
     api_guest_service.delete.side_effect = HTTPException(
         status_code=404,
         detail="Guest not found",
