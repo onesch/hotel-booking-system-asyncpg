@@ -7,6 +7,7 @@ class HotelResponse(BaseModel):
     name: str
     address: str
     description: str | None
+    owner_id: int
     created_at: datetime
 
 

@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 
-from app.dependencies.auth import get_current_guest
+from app.dependencies.auth import get_current_guest, require_owner_or_admin
 from app.services.guests import GuestService
 from app.schemas.guests import (
     GuestResponse,
@@ -50,14 +50,10 @@ async def update_guest(
     """
     Update guest.
     """
-    if (
-        current_guest["role"] != "admin"
-        and current_guest["id"] != guest.id
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only update yourself",
-        )
+    require_owner_or_admin(
+        current_guest, owner_id=guest.id,
+    )
+
     return await guests_service.update(guest)
 
 
@@ -69,12 +65,8 @@ async def delete_guest(
     """
     Delete guest.
     """
-    if (
-        current_guest["role"] != "admin"
-        and current_guest["id"] != guest.id
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only delete yourself",
-        )
+    require_owner_or_admin(
+        current_guest, owner_id=guest.id,
+    )
+
     return await guests_service.delete(guest)

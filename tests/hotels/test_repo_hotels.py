@@ -12,6 +12,7 @@ async def test_create_hotel(hotel_repository, hotel_data):
         name=hotel_data["name"],
         address=hotel_data["address"],
         description=hotel_data["description"],
+        owner_id=hotel_data["owner_id"],
     )
 
     assert result == hotel_data
@@ -21,13 +22,14 @@ async def test_create_hotel(hotel_repository, hotel_data):
     query, *args = hotel_repository.db.fetchrow.call_args.args
 
     assert "INSERT INTO hotels" in query
-    assert "VALUES ($1, $2, $3)" in query
+    assert "VALUES ($1, $2, $3, $4)" in query
     assert "RETURNING *" in query
 
     assert args == [
         hotel_data["name"],
         hotel_data["address"],
         hotel_data["description"],
+        hotel_data["owner_id"],
     ]
 
 

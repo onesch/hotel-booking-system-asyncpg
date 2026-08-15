@@ -1,9 +1,11 @@
 from fastapi import APIRouter
 
 from app.services.auth import AuthService
-from app.schemas.guests import (
+from app.schemas.guests import GuestResponse
+from app.schemas.auth import (
+    BusinessRegisterResponse,
     GuestRegister,
-    GuestResponse,
+    BusinessRegister,
 )
 
 
@@ -20,3 +22,13 @@ async def register(
     Register a new guest.
     """
     return await auth_service.register(guest)
+
+
+@router.post("/register/business", response_model=BusinessRegisterResponse)
+async def register_business(
+    business: BusinessRegister,
+):
+    """
+    Register a business account with a hotel.
+    """
+    return await auth_service.register_business(business)

@@ -42,3 +42,32 @@ async def require_admin(
         )
 
     return current_guest
+
+
+async def require_business(
+    current_guest=Depends(get_current_guest),
+) -> dict:
+    """
+    Require the authenticated guest to be a business account.
+    """
+    if current_guest["role"] != "business":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Business access required",
+        )
+
+    return current_guest
+
+
+def require_owner_or_admin(
+    current_guest: dict,
+    owner_id: int,
+) -> None:
+    if (
+        current_guest["role"] != "admin"
+        and current_guest["id"] != owner_id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only manage your own resources",
+        )

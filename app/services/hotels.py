@@ -19,6 +19,7 @@ class HotelService:
     async def create(
         self,
         hotel: HotelCreate,
+        owner_id: int,
     ) -> dict | None:
         """
         Create a new hotel.
@@ -27,6 +28,7 @@ class HotelService:
             name=hotel.name,
             address=hotel.address,
             description=hotel.description,
+            owner_id=owner_id,
         )
 
     async def get_by_id(

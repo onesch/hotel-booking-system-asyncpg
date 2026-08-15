@@ -38,6 +38,45 @@ class GuestRepository():
                 detail="Guest with this email or phone already exists"
             )
 
+    async def create_business(
+        self,
+        first_name: str,
+        last_name: str,
+        email: str,
+        phone: str,
+        password_hash: str,
+        conn: asyncpg.Connection | None = None,
+    ) -> dict | None:
+        """
+        Create a guest with a business role.
+
+        `conn` can be passed to use an existing database connection for transactions.
+        """
+        query = """
+            INSERT INTO guests (
+                first_name, last_name, email, phone, password_hash, role
+            )
+            VALUES ($1, $2, $3, $4, $5, 'business')
+            RETURNING *;
+        """
+
+        try:
+            guest = await self.db.fetchrow(
+                query,
+                first_name,
+                last_name,
+                email,
+                phone,
+                password_hash,
+                conn=conn,
+            )
+            return guest
+        except asyncpg.exceptions.UniqueViolationError:
+            raise HTTPException(
+                status_code=409,
+                detail="Guest with this email or phone already exists",
+            )
+
     async def get_by_id(
         self,
         guest_id: int,

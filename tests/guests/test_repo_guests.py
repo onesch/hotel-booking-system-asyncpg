@@ -1,3 +1,5 @@
+import asyncpg
+from fastapi import HTTPException
 import pytest
 
 """
@@ -37,6 +39,88 @@ async def test_create_guest(guest_repository, guest_data):
         created_guest["phone"],
         created_guest["password_hash"],
     ]
+
+
+@pytest.mark.asyncio
+async def test_create_guest_duplicate(guest_repository):
+    guest_repository.db.fetchrow.side_effect = (
+        asyncpg.exceptions.UniqueViolationError()
+    )
+
+    with pytest.raises(HTTPException) as exc_info:
+        await guest_repository.create(
+            first_name="Name",
+            last_name="LastName",
+            email="example@email.com",
+            phone="123456789",
+            password_hash="hashed_password",
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.detail == (
+        "Guest with this email or phone already exists"
+    )
+
+
+@pytest.mark.asyncio
+async def test_create_business_guest(guest_repository, guest_data):
+    created_guest = {
+        **guest_data,
+        "password_hash": "hashed_password",
+        "role": "business",
+    }
+
+    guest_repository.db.fetchrow.return_value = created_guest
+
+    result = await guest_repository.create_business(
+        first_name=created_guest["first_name"],
+        last_name=created_guest["last_name"],
+        email=created_guest["email"],
+        phone=created_guest["phone"],
+        password_hash=created_guest["password_hash"],
+    )
+
+    assert result == created_guest
+
+    guest_repository.db.fetchrow.assert_awaited_once()
+
+    query, *args = guest_repository.db.fetchrow.call_args.args
+
+    assert "INSERT INTO guests" in query
+    assert "VALUES ($1, $2, $3, $4, $5, 'business')" in query
+    assert "RETURNING *" in query
+
+    assert args == [
+        created_guest["first_name"],
+        created_guest["last_name"],
+        created_guest["email"],
+        created_guest["phone"],
+        created_guest["password_hash"],
+    ]
+
+
+@pytest.mark.asyncio
+async def test_create_business_guest_duplicate(
+    guest_repository,
+    guest_data,
+):
+    guest_repository.db.fetchrow.side_effect = (
+        asyncpg.exceptions.UniqueViolationError()
+    )
+
+    with pytest.raises(HTTPException) as exc:
+        await guest_repository.create_business(
+            first_name=guest_data["first_name"],
+            last_name=guest_data["last_name"],
+            email=guest_data["email"],
+            phone=guest_data["phone"],
+            password_hash="hashed_password",
+        )
+
+    assert exc.value.status_code == 409
+    assert exc.value.detail == (
+        "Guest with this email or phone already exists"
+    )
 
 
 @pytest.mark.asyncio

@@ -12,14 +12,6 @@ class GuestResponse(BaseModel):
     created_at: datetime
 
 
-class GuestRegister(BaseModel):
-    first_name: str
-    last_name: str
-    email: EmailStr
-    phone: str
-    password: str
-
-
 class GuestUpdate(BaseModel):
     id: int
     first_name: str | None = None

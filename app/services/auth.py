@@ -1,20 +1,25 @@
 from app.db_services.guests import GuestRepository
-from app.schemas.guests import GuestRegister
+from app.db_services.hotels import HotelRepository
 from app.security import hash_password, verify_password
+from app.schemas.auth import (
+    GuestRegister,
+    BusinessRegister,
+)
 
 
 class AuthService:
     """
-    Service class manages guest authentication and authorization.
+    Service class manages authentication and authorization
     """
 
     def __init__(self):
         self.guest_repo = GuestRepository()
+        self.hotel_repo = HotelRepository()
 
     async def register(
         self,
         guest: GuestRegister,
-    ):
+    ) -> dict | None:
         """
         Register a guest with a hashed password.
         """
@@ -48,3 +53,35 @@ class AuthService:
             return None
 
         return guest
+
+    async def register_business(
+        self,
+        business: BusinessRegister,
+    ) -> dict[str, dict | None]:
+        """
+        Register a business account with a hotel.
+        """
+        password_hash = hash_password(business.password)
+
+        async with self.guest_repo.db.transaction() as conn:
+            guest = await self.guest_repo.create_business(
+                first_name=business.first_name,
+                last_name=business.last_name,
+                email=business.email,
+                phone=business.phone,
+                password_hash=password_hash,
+                conn=conn,
+            )
+
+            hotel = await self.hotel_repo.create(
+                name=business.hotel_name,
+                address=business.hotel_address,
+                description=business.hotel_description,
+                owner_id=guest["id"],
+                conn=conn,
+            )
+
+        return {
+            "guest": guest,
+            "hotel": hotel,
+        }

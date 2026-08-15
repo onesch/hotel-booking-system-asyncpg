@@ -20,9 +20,13 @@ async def test_create_hotel(hotel_service, hotel_data):
         name=hotel_data["name"],
         address=hotel_data["address"],
         description=hotel_data["description"],
+        owner_id=hotel_data["owner_id"],
     )
 
-    result = await hotel_service.create(hotel)
+    result = await hotel_service.create(
+        hotel=hotel,
+        owner_id=hotel_data["owner_id"],
+    )
 
     assert result == hotel_data
 
@@ -30,6 +34,7 @@ async def test_create_hotel(hotel_service, hotel_data):
         name=hotel_data["name"],
         address=hotel_data["address"],
         description=hotel_data["description"],
+        owner_id=hotel_data["owner_id"],
     )
 
 

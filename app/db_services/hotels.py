@@ -1,3 +1,5 @@
+import asyncpg
+
 from app.db import Database
 
 
@@ -14,14 +16,19 @@ class HotelRepository():
         name: str,
         address: str,
         description: str | None,
+        owner_id: int,
+        conn: asyncpg.Connection | None = None,
     ) -> dict | None:
+        """
+        Create a new hotel.
+
+        `conn` can be passed to use an existing database connection for transactions.
+        """
         query = """
             INSERT INTO hotels (
-                name,
-                address,
-                description
+                name, address, description, owner_id
             )
-            VALUES ($1, $2, $3)
+            VALUES ($1, $2, $3, $4)
             RETURNING *;
         """
         return await self.db.fetchrow(
@@ -29,6 +36,8 @@ class HotelRepository():
             name,
             address,
             description,
+            owner_id,
+            conn=conn,
         )
 
     async def get_by_id(
@@ -41,14 +50,12 @@ class HotelRepository():
                 name,
                 address,
                 description,
+                owner_id,
                 created_at
             FROM hotels
             WHERE id = $1;
         """
-        return await self.db.fetchrow(
-            query,
-            hotel_id,
-        )
+        return await self.db.fetchrow(query, hotel_id)
 
     async def get_all(
         self,
@@ -59,6 +66,7 @@ class HotelRepository():
                 name,
                 address,
                 description,
+                owner_id,
                 created_at
             FROM hotels;
         """

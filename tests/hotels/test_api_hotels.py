@@ -9,7 +9,12 @@ HTTP request -> Router -> mock HotelService
 """
 
 @pytest.mark.asyncio
-async def test_create_hotel(api_hotel_service, hotel_data, monkeypatch):
+async def test_create_hotel(
+    api_hotel_service,
+    hotel_data,
+    override_business_guest,
+    monkeypatch,
+):
     api_hotel_service.create.return_value = hotel_data
 
     monkeypatch.setattr(
@@ -38,11 +43,13 @@ async def test_create_hotel(api_hotel_service, hotel_data, monkeypatch):
 
     api_hotel_service.create.assert_awaited_once()
 
-    hotel = api_hotel_service.create.call_args.args[0]
+    hotel = api_hotel_service.create.call_args.kwargs["hotel"]
+    owner_id = api_hotel_service.create.call_args.kwargs["owner_id"]
 
     assert hotel.name == hotel_data["name"]
     assert hotel.address == hotel_data["address"]
     assert hotel.description == hotel_data["description"]
+    assert owner_id == override_business_guest["id"]
 
 
 @pytest.mark.asyncio
@@ -125,12 +132,18 @@ async def test_get_all_hotels(api_hotel_service, hotel_data, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_update_hotel(api_hotel_service, hotel_data, monkeypatch):
+async def test_update_hotel(
+    api_hotel_service,
+    hotel_data,
+    override_business_guest,
+    monkeypatch,
+):
     updated_hotel = {
         **hotel_data,
         "description": "Updated",
     }
 
+    api_hotel_service.get_by_id.return_value = hotel_data
     api_hotel_service.update.return_value = updated_hotel
 
     monkeypatch.setattr(
@@ -158,19 +171,27 @@ async def test_update_hotel(api_hotel_service, hotel_data, monkeypatch):
     assert response.status_code == 200
     assert response.json() == updated_hotel
 
+    api_hotel_service.get_by_id.assert_awaited_once_with(
+        hotel_data["id"]
+    )
     api_hotel_service.update.assert_awaited_once()
 
     hotel = api_hotel_service.update.call_args.args[0]
 
-    assert hotel.id == hotel_data["id"]
-    assert hotel.name is None
-    assert hotel.address is None
-    assert hotel.description == "Updated"
+    assert hotel["id"] == hotel_data["id"]
+    assert hotel["name"] == hotel_data["name"]
+    assert hotel["address"] == hotel_data["address"]
+    assert hotel["description"] == hotel_data["description"]
+    assert hotel["owner_id"] == override_business_guest["id"]
 
 
 @pytest.mark.asyncio
-async def test_update_hotel_not_found(api_hotel_service, monkeypatch):
-    api_hotel_service.update.side_effect = HTTPException(
+async def test_update_hotel_not_found(
+    api_hotel_service,
+    override_business_guest,
+    monkeypatch,
+):
+    api_hotel_service.get_by_id.side_effect = HTTPException(
         status_code=404,
         detail="Hotel not found",
     )
@@ -200,16 +221,63 @@ async def test_update_hotel_not_found(api_hotel_service, monkeypatch):
     assert response.status_code == 404
     assert response.json() == {"detail": "Hotel not found"}
 
-    api_hotel_service.update.assert_awaited_once()
-
-    hotel = api_hotel_service.update.call_args.args[0]
-
-    assert hotel.id == 999
-    assert hotel.description == "Not found"
+    api_hotel_service.get_by_id.assert_awaited_once_with(999)
+    api_hotel_service.update.assert_not_awaited()
 
 
 @pytest.mark.asyncio
-async def test_delete_hotel(api_hotel_service, hotel_data, monkeypatch):
+async def test_update_hotel_forbidden(
+    api_hotel_service,
+    hotel_data,
+    override_business_guest,
+    monkeypatch,
+):
+    api_hotel_service.get_by_id.return_value = {
+        **hotel_data,
+        "owner_id": 999,
+    }
+
+    monkeypatch.setattr(
+        "app.routers.hotels.hotels_service",
+        api_hotel_service,
+    )
+
+    payload = {
+        "id": hotel_data["id"],
+        "name": None,
+        "address": None,
+        "description": "Hacked",
+    }
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as client:
+
+        response = await client.patch(
+            "/hotels/update",
+            json=payload,
+        )
+
+    assert response.status_code == 403
+    assert response.json() == {
+        "detail": "You can only manage your own resources"
+    }
+
+    api_hotel_service.get_by_id.assert_awaited_once_with(
+        hotel_data["id"]
+    )
+    api_hotel_service.update.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_delete_hotel(
+    api_hotel_service,
+    hotel_data,
+    override_business_guest,
+    monkeypatch,
+):
+    api_hotel_service.get_by_id.return_value = hotel_data
     api_hotel_service.delete.return_value = hotel_data
 
     monkeypatch.setattr(
@@ -235,16 +303,19 @@ async def test_delete_hotel(api_hotel_service, hotel_data, monkeypatch):
     assert response.status_code == 200
     assert response.json() == hotel_data
 
+    api_hotel_service.get_by_id.assert_awaited_once_with(
+        hotel_data["id"]
+    )
     api_hotel_service.delete.assert_awaited_once()
-
-    hotel = api_hotel_service.delete.call_args.args[0]
-
-    assert hotel.id == hotel_data["id"]
 
 
 @pytest.mark.asyncio
-async def test_delete_hotel_not_found(api_hotel_service, monkeypatch):
-    api_hotel_service.delete.side_effect = HTTPException(
+async def test_delete_hotel_not_found(
+    api_hotel_service,
+    override_business_guest,
+    monkeypatch,
+):
+    api_hotel_service.get_by_id.side_effect = HTTPException(
         status_code=404,
         detail="Hotel not found",
     )
@@ -272,8 +343,45 @@ async def test_delete_hotel_not_found(api_hotel_service, monkeypatch):
     assert response.status_code == 404
     assert response.json() == {"detail": "Hotel not found"}
 
-    api_hotel_service.delete.assert_awaited_once()
+    api_hotel_service.get_by_id.assert_awaited_once_with(999)
+    api_hotel_service.delete.assert_not_awaited()
 
-    hotel = api_hotel_service.delete.call_args.args[0]
 
-    assert hotel.id == 999
+@pytest.mark.asyncio
+async def test_delete_hotel_forbidden(
+    api_hotel_service,
+    hotel_data,
+    override_business_guest,
+    monkeypatch,
+):
+    api_hotel_service.get_by_id.return_value = {
+        **hotel_data,
+        "owner_id": 999,
+    }
+
+    monkeypatch.setattr(
+        "app.routers.hotels.hotels_service",
+        api_hotel_service,
+    )
+
+    payload = {
+        "id": hotel_data["id"],
+    }
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as client:
+
+        response = await client.request(
+            "DELETE",
+            "/hotels/delete",
+            json=payload,
+        )
+
+    assert response.status_code == 403
+
+    api_hotel_service.get_by_id.assert_awaited_once_with(
+        hotel_data["id"]
+    )
+    api_hotel_service.delete.assert_not_awaited()

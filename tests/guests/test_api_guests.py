@@ -174,7 +174,7 @@ async def test_update_guest_forbidden(
 
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You can only update yourself"
+        "detail": "You can only manage your own resources"
     }
 
     api_guest_service.update.assert_not_awaited()
@@ -290,7 +290,7 @@ async def test_delete_guest_forbidden(
 
     assert response.status_code == 403
     assert response.json() == {
-        "detail": "You can only delete yourself"
+        "detail": "You can only manage your own resources"
     }
 
     api_guest_service.delete.assert_not_awaited()
