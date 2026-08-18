@@ -1,5 +1,6 @@
 from fastapi.security import HTTPBasic
 from passlib.context import CryptContext
+from pydantic import SecretStr
 
 
 # HTTP Basic authentication
@@ -24,8 +25,8 @@ def verify_password(
     )
 
 
-def hash_password(password: str) -> str:
+def hash_password(password: SecretStr) -> str:
     """
     Hash a password using bcrypt.
     """
-    return pwd_context.hash(password)
+    return pwd_context.hash(password.get_secret_value())
