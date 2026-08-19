@@ -35,7 +35,14 @@ class GuestService():
         """
         Get guest by email.
         """
-        return await self.repo.get_by_email(email)
+        guest = await self.repo.get_by_email(email)
+
+        if guest is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Guest not found",
+            )
+        return guest
 
     async def get_all(self):
         """
