@@ -1,9 +1,6 @@
 import re
 from pydantic import BaseModel, EmailStr, SecretStr, field_validator
 
-from app.schemas.guests import GuestResponse
-from app.schemas.hotels import HotelResponse
-
 
 class GuestRegister(BaseModel):
     first_name: str
@@ -32,6 +29,7 @@ class GuestRegister(BaseModel):
         value = SecretStr(value)
         return value
 
+
 class BusinessRegister(BaseModel):
     first_name: str
     last_name: str
@@ -39,11 +37,11 @@ class BusinessRegister(BaseModel):
     phone: str
     password: SecretStr
 
-    hotel_name: str
-    hotel_address: str
-    hotel_description: str | None = None
-
 
 class BusinessRegisterResponse(BaseModel):
-    guest: GuestResponse
-    hotel: HotelResponse
+    id: int
+    first_name: str
+    last_name: str
+    email: EmailStr
+    phone: str
+    role: str
