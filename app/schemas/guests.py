@@ -18,7 +18,6 @@ class GuestUpdate(BaseModel):
     last_name: str | None = None
     email: EmailStr | None = None
     phone: str | None = None
-    role: str | None = None
     password_hash: str | None = None
 
 

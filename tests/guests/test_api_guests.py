@@ -114,7 +114,6 @@ async def test_update_guest(
         "last_name": None,
         "email": None,
         "phone": None,
-        "role": None,
     }
 
     async with AsyncClient(
@@ -139,7 +138,6 @@ async def test_update_guest(
     assert guest.last_name is None
     assert guest.email is None
     assert guest.phone is None
-    assert guest.role is None
 
 
 @pytest.mark.asyncio
@@ -159,7 +157,6 @@ async def test_update_guest_forbidden(
         "last_name": None,
         "email": None,
         "phone": None,
-        "role": None,
     }
 
     async with AsyncClient(
@@ -200,7 +197,6 @@ async def test_update_guest_not_found(
         "last_name": None,
         "email": None,
         "phone": None,
-        "role": None,
     }
 
     async with AsyncClient(

@@ -234,7 +234,6 @@ async def test_update_guest(guest_repository, guest_data):
         last_name=None,
         email=None,
         phone=None,
-        role=None,
         password_hash=None,
     )
 
@@ -255,7 +254,6 @@ async def test_update_guest(guest_repository, guest_data):
         None,
         None,
         None,
-        None,
     ]
 
 
@@ -269,7 +267,6 @@ async def test_update_guest_not_found(guest_repository):
         last_name=None,
         email=None,
         phone=None,
-        role=None,
         password_hash=None,
     )
 
@@ -285,7 +282,6 @@ async def test_update_guest_not_found(guest_repository):
     assert args == [
         999,
         "Name",
-        None,
         None,
         None,
         None,

@@ -1,6 +1,4 @@
 import asyncpg
-from contextlib import asynccontextmanager
-from collections.abc import AsyncGenerator
 from typing import Any
 
 from app.settings import DATABASE_URL
@@ -91,39 +89,16 @@ class Database:
         self,
         query: str,
         *args,
-        conn: asyncpg.Connection | None = None,
     ) -> dict | None:
         """
         Execute SQL query and return a single row.
 
         Usually used with queries containing RETURNING clause.
         """
-        if conn is not None:
-            result = await conn.fetchrow(query, *args)
-            return dict(result) if result else None
-
-        connection = await self.get_connection()
-
-        try:
-            result = await connection.fetchrow(query, *args)
-            return dict(result) if result else None
-        finally:
-            await self.close_connection(connection)
-
-    @asynccontextmanager
-    async def transaction(
-        self,
-    ) -> AsyncGenerator[asyncpg.Connection, None]:
-        """
-        Manage a database transaction using a single connection.
-
-        Starts a transaction and yields the active database connection
-        for executing multiple queries as a single atomic operation.
-        """
         conn = await self.get_connection()
 
         try:
-            async with conn.transaction():
-                yield conn
+            result = await conn.fetchrow(query, *args)
+            return dict(result) if result else None
         finally:
             await self.close_connection(conn)

@@ -1,5 +1,3 @@
-import asyncpg
-
 from app.db import Database
 
 
@@ -17,16 +15,13 @@ class HotelRepository():
         address: str,
         description: str | None,
         owner_id: int,
-        conn: asyncpg.Connection | None = None,
     ) -> dict | None:
-        """
-        Create a new hotel.
-
-        `conn` can be passed to use an existing database connection for transactions.
-        """
         query = """
             INSERT INTO hotels (
-                name, address, description, owner_id
+                name,
+                address,
+                description,
+                owner_id
             )
             VALUES ($1, $2, $3, $4)
             RETURNING *;
@@ -37,13 +32,9 @@ class HotelRepository():
             address,
             description,
             owner_id,
-            conn=conn,
         )
 
-    async def get_by_id(
-        self,
-        hotel_id: int,
-    ) -> dict | None:
+    async def get_by_id(self, id: int) -> dict | None:
         query = """
             SELECT
                 id,
@@ -55,11 +46,9 @@ class HotelRepository():
             FROM hotels
             WHERE id = $1;
         """
-        return await self.db.fetchrow(query, hotel_id)
+        return await self.db.fetchrow(query, id)
 
-    async def get_all(
-        self,
-    ) -> list[dict]:
+    async def get_all(self) -> list[dict]:
         query = """
             SELECT
                 id,
@@ -89,13 +78,14 @@ class HotelRepository():
             RETURNING *;
         """
         return await self.db.fetchrow(
-            query, id, name, address, description,
+            query,
+            id,
+            name,
+            address,
+            description,
         )
 
-    async def delete(
-        self,
-        id: int,
-    ) -> None:
+    async def delete(self, id: int) -> dict | None:
         query = """
             DELETE FROM hotels
             WHERE id = $1

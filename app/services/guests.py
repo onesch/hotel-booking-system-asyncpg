@@ -63,7 +63,6 @@ class GuestService():
             last_name=guest.last_name,
             email=guest.email,
             phone=guest.phone,
-            role=guest.role,
             password_hash=guest.password_hash,
         )
 

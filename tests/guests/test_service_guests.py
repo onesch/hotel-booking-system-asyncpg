@@ -62,7 +62,6 @@ async def test_update_guest(guest_service, guest_data):
         last_name=None,
         email=None,
         phone=None,
-        role=None,
         password_hash=None,
     )
 
@@ -76,7 +75,6 @@ async def test_update_guest(guest_service, guest_data):
         last_name=None,
         email=None,
         phone=None,
-        role=None,
         password_hash=None,
     )
 
@@ -91,7 +89,6 @@ async def test_update_guest_not_found(guest_service):
         last_name=None,
         email=None,
         phone=None,
-        role=None,
         password_hash=None,
     )
 
@@ -107,7 +104,6 @@ async def test_update_guest_not_found(guest_service):
         last_name=None,
         email=None,
         phone=None,
-        role=None,
         password_hash=None,
     )
 

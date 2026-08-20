@@ -22,14 +22,23 @@ class GuestRepository():
     ) -> dict | None:
         query = """
             INSERT INTO guests (
-                first_name, last_name, email, phone, password_hash
+                first_name,
+                last_name,
+                email,
+                phone,
+                password_hash
             )
             VALUES ($1, $2, $3, $4, $5)
             RETURNING *;
         """
         try:
             guest = await self.db.fetchrow(
-                query, first_name, last_name, email, phone, password_hash
+                query,
+                first_name,
+                last_name,
+                email,
+                phone,
+                password_hash,
             )
             return guest
         except asyncpg.exceptions.UniqueViolationError:
@@ -45,16 +54,15 @@ class GuestRepository():
         email: str,
         phone: str,
         password_hash: str,
-        conn: asyncpg.Connection | None = None,
     ) -> dict | None:
-        """
-        Create a guest with a business role.
-
-        `conn` can be passed to use an existing database connection for transactions.
-        """
         query = """
             INSERT INTO guests (
-                first_name, last_name, email, phone, password_hash, role
+                first_name,
+                last_name,
+                email,
+                phone,
+                password_hash,
+                role
             )
             VALUES ($1, $2, $3, $4, $5, 'business')
             RETURNING *;
@@ -68,7 +76,6 @@ class GuestRepository():
                 email,
                 phone,
                 password_hash,
-                conn=conn,
             )
             return guest
         except asyncpg.exceptions.UniqueViolationError:
@@ -77,10 +84,7 @@ class GuestRepository():
                 detail="Guest with this email or phone already exists",
             )
 
-    async def get_by_id(
-        self,
-        guest_id: int,
-    ) -> dict | None:
+    async def get_by_id(self, id: int) -> dict | None:
         query = """
             SELECT
                 id,
@@ -93,24 +97,26 @@ class GuestRepository():
             FROM guests
             WHERE id = $1;
         """
-        return await self.db.fetchrow(
-            query,
-            guest_id,
-        )
+        return await self.db.fetchrow(query, id)
 
-    async def get_by_email(self, email: str):
+    async def get_by_email(self, email: str) -> dict | None:
         return await self.db.fetchrow(
             """
-            SELECT *
+            SELECT
+                id,
+                first_name,
+                last_name,
+                email,
+                phone,
+                role,
+                created_at
             FROM guests
             WHERE email = $1
             """,
             email,
         )
 
-    async def get_all(
-        self,
-    ) -> list[dict]:
+    async def get_all(self) -> list[dict]:
         query = """
             SELECT
                 id,
@@ -135,7 +141,6 @@ class GuestRepository():
         last_name: str | None,
         email: str | None,
         phone: str | None,
-        role: str | None,
         password_hash=None,
     ) -> dict | None:
         query = """
@@ -145,14 +150,13 @@ class GuestRepository():
                 last_name = COALESCE($3, last_name),
                 email = COALESCE($4, email),
                 phone = COALESCE($5, phone),
-                role = COALESCE($6, role),
                 password_hash = COALESCE($7, password_hash)
             WHERE id = $1
             RETURNING *;
         """
         try:
             guest = await self.db.fetchrow(
-                query, id, first_name, last_name, email, phone, role, password_hash,
+                query, id, first_name, last_name, email, phone, password_hash,
             )
             return guest
         except asyncpg.exceptions.UniqueViolationError:
@@ -161,10 +165,7 @@ class GuestRepository():
                 detail="Guest with this email or phone already exists"
             )
 
-    async def delete(
-        self,
-        id: int,
-    ):
+    async def delete(self, id: int) -> dict | None:
         query = """
             DELETE FROM guests
             WHERE id = $1

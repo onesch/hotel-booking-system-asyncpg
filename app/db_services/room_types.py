@@ -48,9 +48,7 @@ class RoomTypeRepository:
         """
         return await self.db.fetchrow(query, room_type_id)
 
-    async def get_all(
-        self,
-    ) -> list[dict]:
+    async def get_all(self) -> list[dict]:
         query = """
             SELECT
                 id,

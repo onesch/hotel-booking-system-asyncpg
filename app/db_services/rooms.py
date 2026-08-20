@@ -40,19 +40,14 @@ class RoomRepository:
                 hotel_id,
                 room_type_id,
             )
-
             return room
-
         except asyncpg.exceptions.ForeignKeyViolationError:
             raise HTTPException(
                 status_code=404,
                 detail="Hotel or room type not found",
             )
 
-    async def get_by_id(
-        self,
-        room_id: int,
-    ) -> dict | None:
+    async def get_by_id(self, id: int) -> dict | None:
         query = """
             SELECT
                 id,
@@ -64,11 +59,9 @@ class RoomRepository:
             FROM rooms
             WHERE id = $1;
         """
-        return await self.db.fetchrow(query, room_id)
+        return await self.db.fetchrow(query, id)
 
-    async def get_all(
-        self,
-    ) -> list[dict]:
+    async def get_all(self) -> list[dict]:
         query = """
             SELECT
                 id,
@@ -120,10 +113,7 @@ class RoomRepository:
                 detail="Hotel or room type not found",
             )
 
-    async def delete(
-        self,
-        id: int,
-    ):
+    async def delete(self, id: int) -> dict | None:
         query = """
             DELETE FROM rooms
             WHERE id = $1
