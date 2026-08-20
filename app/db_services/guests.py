@@ -67,7 +67,6 @@ class GuestRepository():
             VALUES ($1, $2, $3, $4, $5, 'business')
             RETURNING *;
         """
-
         try:
             guest = await self.db.fetchrow(
                 query,
