@@ -127,11 +127,7 @@ class GuestRepository():
                 created_at
             FROM guests;
         """
-        guests = await self.db.fetch(query)
-        return [
-            dict(guest)
-            for guest in guests
-        ]
+        return await self.db.fetch(query)
 
     async def update(
         self,
