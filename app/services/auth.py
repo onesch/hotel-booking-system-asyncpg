@@ -59,29 +59,16 @@ class AuthService:
         business: BusinessRegister,
     ) -> dict[str, dict | None]:
         """
-        Register a business account with a hotel.
+        Register a business account.
         """
         password_hash = hash_password(business.password)
 
-        async with self.guest_repo.db.transaction() as conn:
-            guest = await self.guest_repo.create_business(
-                first_name=business.first_name,
-                last_name=business.last_name,
-                email=business.email,
-                phone=business.phone,
-                password_hash=password_hash,
-                conn=conn,
-            )
+        guest = await self.guest_repo.create_business(
+            first_name=business.first_name,
+            last_name=business.last_name,
+            email=business.email,
+            phone=business.phone,
+            password_hash=password_hash,
+        )
 
-            hotel = await self.hotel_repo.create(
-                name=business.hotel_name,
-                address=business.hotel_address,
-                description=business.hotel_description,
-                owner_id=guest["id"],
-                conn=conn,
-            )
-
-        return {
-            "guest": guest,
-            "hotel": hotel,
-        }
+        return guest

@@ -12,6 +12,16 @@ class GuestResponse(BaseModel):
     created_at: datetime
 
 
+class BusinessResponse(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    email: EmailStr
+    phone: str
+    role: str
+    created_at: datetime
+
+
 class GuestUpdate(BaseModel):
     id: int
     first_name: str | None = None
