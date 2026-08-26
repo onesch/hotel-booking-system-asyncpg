@@ -30,5 +30,5 @@ def downgrade() -> None:
     """Downgrade schema."""
     op.execute("""--sql
         ALTER TABLE guests
-        ALTER COLUMN email SET NOT NULL;
+        ALTER COLUMN email DROP NOT NULL;
     """)

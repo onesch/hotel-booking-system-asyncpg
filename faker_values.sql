@@ -1,30 +1,31 @@
-TRUNCATE TABLE Guests RESTART IDENTITY CASCADE;
-TRUNCATE TABLE Hotels RESTART IDENTITY CASCADE;
-TRUNCATE TABLE Room_Type RESTART IDENTITY CASCADE;
+TRUNCATE TABLE Bookings RESTART IDENTITY CASCADE;
 TRUNCATE TABLE Rooms RESTART IDENTITY CASCADE;
+TRUNCATE TABLE Room_Types RESTART IDENTITY CASCADE;
+TRUNCATE TABLE Hotels RESTART IDENTITY CASCADE;
+TRUNCATE TABLE Guests RESTART IDENTITY CASCADE;
 
-INSERT INTO Guests (First_name, Last_name, Email, Phone, Password_hash)
+INSERT INTO Guests (First_name, Last_name, Email, Phone, Password_hash, role)
 VALUES
-('Иван', 'Иванов', 'ivan.ivanov@example.com', '+79990000001', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Петр', 'Петров', 'petr.petrov@example.com', '+79990000002', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Анна', 'Сидорова', 'anna.sidorova@example.com', '+79990000003', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Мария', 'Кузнецова', 'maria.kuznetsova@example.com', '+79990000004', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Алексей', 'Смирнов', 'alexey.smirnov@example.com', '+79990000005', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Екатерина', 'Попова', 'ekaterina.popova@example.com', '+79990000006', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Дмитрий', 'Васильев', 'dmitry.vasilyev@example.com', '+79990000007', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Ольга', 'Новикова', 'olga.novikova@example.com', '+79990000008', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Сергей', 'Федоров', 'sergey.fedorov@example.com', '+79990000009', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Наталья', 'Морозова', 'natalia.morozova@example.com', '+79990000010', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Максим', 'Волков', 'maxim.volkov@example.com', '+79990000011', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Елена', 'Алексеева', 'elena.alekseeva@example.com', '+79990000012', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Артем', 'Лебедев', 'artem.lebedev@example.com', '+79990000013', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Татьяна', 'Семенова', 'tatyana.semenova@example.com', '+79990000014', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Кирилл', 'Павлов', 'kirill.pavlov@example.com', '+79990000015', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Дарья', 'Орлова', 'daria.orlova@example.com', '+79990000016', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Никита', 'Егоров', 'nikita.egorov@example.com', '+79990000017', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Виктория', 'Николаева', 'victoria.nikolaeva@example.com', '+79990000018', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Андрей', 'Захаров', 'andrey.zakharov@example.com', '+79990000019', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW'),
-('Юлия', 'Беляева', 'yulia.belyaeva@example.com', '+79990000020', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW');
+('Иван', 'Иванов', 'ivan.ivanov@example.com', '+79990000001', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'business'),
+('Петр', 'Петров', 'petr.petrov@example.com', '+79990000002', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'business'),
+('Анна', 'Сидорова', 'anna.sidorova@example.com', '+79990000003', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'business'),
+('Мария', 'Кузнецова', 'maria.kuznetsova@example.com', '+79990000004', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'business'),
+('Алексей', 'Смирнов', 'alexey.smirnov@example.com', '+79990000005', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'business'),
+('Екатерина', 'Попова', 'ekaterina.popova@example.com', '+79990000006', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'business'),
+('Дмитрий', 'Васильев', 'dmitry.vasilyev@example.com', '+79990000007', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'business'),
+('Ольга', 'Новикова', 'olga.novikova@example.com', '+79990000008', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'business'),
+('Сергей', 'Федоров', 'sergey.fedorov@example.com', '+79990000009', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'business'),
+('Наталья', 'Морозова', 'natalia.morozova@example.com', '+79990000010', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'business'),
+('Максим', 'Волков', 'maxim.volkov@example.com', '+79990000011', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'user'),
+('Елена', 'Алексеева', 'elena.alekseeva@example.com', '+79990000012', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'user'),
+('Артем', 'Лебедев', 'artem.lebedev@example.com', '+79990000013', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'user'),
+('Татьяна', 'Семенова', 'tatyana.semenova@example.com', '+79990000014', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'user'),
+('Кирилл', 'Павлов', 'kirill.pavlov@example.com', '+79990000015', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'user'),
+('Дарья', 'Орлова', 'daria.orlova@example.com', '+79990000016', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'user'),
+('Никита', 'Егоров', 'nikita.egorov@example.com', '+79990000017', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'user'),
+('Виктория', 'Николаева', 'victoria.nikolaeva@example.com', '+79990000018', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'user'),
+('Андрей', 'Захаров', 'andrey.zakharov@example.com', '+79990000019', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'user'),
+('Юлия', 'Беляева', 'yulia.belyaeva@example.com', '+79990000020', '$2a$12$gRnhRZBhD/9MOrSOiYRNQ.p.B13d7hvQJBszGzOF01TIU4j0aj4oW', 'user');
 
 INSERT INTO Hotels (name, address, description, owner_id)
 VALUES

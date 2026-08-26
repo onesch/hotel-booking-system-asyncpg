@@ -14,19 +14,19 @@ Create a `.env` file:
 DATABASE_URL=postgresql://<username>:<password>@localhost:5432/hotel_booking_system
 ```
 
-#### 3. Create the database schema
+#### 3. Apply all database migrations
 
 ```bash
-psql -U <username> -d hotel_booking_system -f app/db_services/database.sql
+alembic upgrade head
 ```
 
-#### 4. Populate the database with sample data
+#### 3. Populate the database with sample data
 
 ```bash
-psql -U <username> -d hotel_booking_system -f app/db_services/faker_values.sql
+psql -U <username> -d hotel_booking_system -f faker_values.sql
 ```
 
-#### 5. Run the application
+#### 4. Run the application
 
 ```bash
 make dev
