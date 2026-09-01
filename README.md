@@ -20,13 +20,13 @@ DATABASE_URL=postgresql://<username>:<password>@localhost:5432/hotel_booking_sys
 alembic upgrade head
 ```
 
-#### 3. Populate the database with sample data
+#### 4. Populate the database with sample data
 
 ```bash
 psql -U <username> -d hotel_booking_system -f faker_values.sql
 ```
 
-#### 4. Run the application
+#### 5. Run the application
 
 ```bash
 make dev
