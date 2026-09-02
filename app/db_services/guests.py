@@ -99,21 +99,20 @@ class GuestRepository():
         return await self.db.fetchrow(query, id)
 
     async def get_by_email(self, email: str) -> dict | None:
-        return await self.db.fetchrow(
-            """
+        query = """
             SELECT
                 id,
                 first_name,
                 last_name,
                 email,
                 phone,
+                password_hash,
                 role,
                 created_at
             FROM guests
             WHERE email = $1
-            """,
-            email,
-        )
+            """
+        return await self.db.fetchrow(query, email)
 
     async def get_all(self) -> list[dict]:
         query = """

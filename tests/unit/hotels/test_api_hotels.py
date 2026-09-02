@@ -178,11 +178,10 @@ async def test_update_hotel(
 
     hotel = api_hotel_service.update.call_args.args[0]
 
-    assert hotel["id"] == hotel_data["id"]
-    assert hotel["name"] == hotel_data["name"]
-    assert hotel["address"] == hotel_data["address"]
-    assert hotel["description"] == hotel_data["description"]
-    assert hotel["owner_id"] == override_business_guest["id"]
+    assert hotel.id == hotel_data["id"]
+    assert hotel.name is None
+    assert hotel.address is None
+    assert hotel.description == "Updated"
 
 
 @pytest.mark.asyncio

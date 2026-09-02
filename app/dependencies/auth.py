@@ -63,6 +63,10 @@ def require_owner_or_admin(
     current_guest: dict,
     owner_id: int,
 ) -> None:
+    """
+    require the authenticated guest to be
+    the owner of the resource or an admin.
+    """
     if (
         current_guest["role"] != "admin"
         and current_guest["id"] != owner_id

@@ -61,9 +61,9 @@ async def update_hotel(
     Update hotel.
     Only business account can access this endpoint.
     """
-    hotel = await hotels_service.get_by_id(hotel.id)
+    existing_hotel = await hotels_service.get_by_id(hotel.id)
     require_owner_or_admin(
-        current_guest, owner_id=hotel["owner_id"],
+        current_guest, owner_id=existing_hotel["owner_id"],
     )
 
     return await hotels_service.update(hotel)
@@ -78,9 +78,9 @@ async def delete_hotel(
     Delete hotel.
     Only business account can access this endpoint.
     """
-    hotel = await hotels_service.get_by_id(hotel.id)
+    existing_hotel = await hotels_service.get_by_id(hotel.id)
     require_owner_or_admin(
-        current_guest, owner_id=hotel["owner_id"],
+        current_guest, owner_id=existing_hotel["owner_id"],
     )
 
     return await hotels_service.delete(hotel)
