@@ -1,5 +1,5 @@
 import asyncpg
-from fastapi import HTTPException
+from app.exceptions.database import RoomAlreadyBookedError
 
 from app.db import Database
 
@@ -34,11 +34,8 @@ class BookingRepository():
                 check_out_date,
             )
             return booking
-        except asyncpg.exceptions.ExclusionViolationError:
-            raise HTTPException(
-                status_code=409,
-                detail="Room is already booked for these dates",
-            )
+        except asyncpg.exceptions.ExclusionViolationError as e:
+            raise RoomAlreadyBookedError from e
 
     async def get_by_id(self, id: int) -> dict | None:
         query = """
@@ -87,11 +84,8 @@ class BookingRepository():
                 check_in_date,
                 check_out_date,
             )
-        except asyncpg.exceptions.ExclusionViolationError:
-            raise HTTPException(
-                status_code=409,
-                detail="Room is already booked for these dates",
-            )
+        except asyncpg.exceptions.ExclusionViolationError as e:
+            raise RoomAlreadyBookedError from e
 
     async def delete(self, id: int) -> dict | None:
         query = """

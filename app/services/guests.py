@@ -1,9 +1,8 @@
-from fastapi import HTTPException
-
 from app.db_services.guests import GuestRepository
+from app.exceptions.http import NotFoundException
 from app.schemas.guests import (
-    GuestDelete,
     GuestUpdate,
+    GuestDelete,
 )
 
 
@@ -25,10 +24,8 @@ class GuestService():
         guest = await self.repo.get_by_id(guest_id)
 
         if guest is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Guest not found",
-            )
+            raise NotFoundException(detail="Guest not found")
+        
         return guest
 
     async def get_by_email(self, email: str):
@@ -38,10 +35,8 @@ class GuestService():
         guest = await self.repo.get_by_email(email)
 
         if guest is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Guest not found",
-            )
+            raise NotFoundException(detail="Guest not found")
+
         return guest
 
     async def get_all(self):
@@ -67,10 +62,7 @@ class GuestService():
         )
 
         if updated_guest is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Guest not found",
-            )
+            raise NotFoundException(detail="Guest not found")
 
         return updated_guest
 
@@ -84,9 +76,6 @@ class GuestService():
         deleted_guest = await self.repo.delete(id=guest.id)
 
         if deleted_guest is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Guest not found",
-            )
+            raise NotFoundException(detail="Guest not found")
 
         return deleted_guest

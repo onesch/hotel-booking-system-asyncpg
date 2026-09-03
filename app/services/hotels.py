@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 
 from app.db_services.hotels import HotelRepository
+from app.exceptions.http import NotFoundException
 from app.schemas.hotels import (
     HotelCreate,
     HotelDelete,
@@ -41,10 +42,7 @@ class HotelService:
         hotel = await self.repo.get_by_id(hotel_id)
 
         if hotel is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Hotel not found",
-            )
+            raise NotFoundException(detail="Hotel not found")
 
         return hotel
 
@@ -71,10 +69,7 @@ class HotelService:
         )
 
         if updated_hotel is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Hotel not found",
-            )
+            raise NotFoundException(detail="Hotel not found")
 
         return updated_hotel
 
@@ -88,9 +83,6 @@ class HotelService:
         deleted_hotel = await self.repo.delete(id=hotel.id)
 
         if deleted_hotel is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Hotel not found",
-            )
+            raise NotFoundException(detail="Hotel not found")
 
         return deleted_hotel

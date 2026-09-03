@@ -1,7 +1,7 @@
 import asyncpg
-from fastapi import HTTPException
 
 from app.db import Database
+from app.exceptions.database import GuestAlreadyExistsError
 
 
 class GuestRepository():
@@ -41,11 +41,9 @@ class GuestRepository():
                 password_hash,
             )
             return guest
-        except asyncpg.exceptions.UniqueViolationError:
-            raise HTTPException(
-                status_code=409,
-                detail="Guest with this email or phone already exists"
-            )
+
+        except asyncpg.exceptions.UniqueViolationError as e:
+            raise GuestAlreadyExistsError from e
 
     async def create_business(
         self,
@@ -77,11 +75,9 @@ class GuestRepository():
                 password_hash,
             )
             return guest
-        except asyncpg.exceptions.UniqueViolationError:
-            raise HTTPException(
-                status_code=409,
-                detail="Guest with this email or phone already exists",
-            )
+
+        except asyncpg.exceptions.UniqueViolationError as e:
+            raise GuestAlreadyExistsError from e
 
     async def get_by_id(self, id: int) -> dict | None:
         query = """
@@ -150,14 +146,18 @@ class GuestRepository():
         """
         try:
             guest = await self.db.fetchrow(
-                query, id, first_name, last_name, email, phone, password_hash,
+                query,
+                id,
+                first_name,
+                last_name,
+                email,
+                phone,
+                password_hash,
             )
             return guest
-        except asyncpg.exceptions.UniqueViolationError:
-            raise HTTPException(
-                status_code=409,
-                detail="Guest with this email or phone already exists"
-            )
+
+        except asyncpg.exceptions.UniqueViolationError as e:
+            raise GuestAlreadyExistsError from e
 
     async def delete(self, id: int) -> dict | None:
         query = """

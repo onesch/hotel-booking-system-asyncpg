@@ -1,5 +1,7 @@
 from app.db_services.guests import GuestRepository
 from app.db_services.hotels import HotelRepository
+from app.exceptions.http import ConflictException
+from app.exceptions.database import GuestAlreadyExistsError
 from app.security import hash_password, verify_password
 from app.schemas.auth import (
     GuestRegister,
@@ -25,13 +27,19 @@ class AuthService:
         """
         password_hash = hash_password(guest.password)
 
-        return await self.guest_repo.create(
-            first_name=guest.first_name,
-            last_name=guest.last_name,
-            email=guest.email,
-            phone=guest.phone,
-            password_hash=password_hash,
-        )
+        try:
+            return await self.guest_repo.create(
+                first_name=guest.first_name,
+                last_name=guest.last_name,
+                email=guest.email,
+                phone=guest.phone,
+                password_hash=password_hash,
+            )
+
+        except GuestAlreadyExistsError:
+            raise ConflictException(
+                detail="Guest with this email or phone already exists"
+            )
 
     async def authenticate(
         self,
@@ -63,12 +71,16 @@ class AuthService:
         """
         password_hash = hash_password(business.password)
 
-        guest = await self.guest_repo.create_business(
-            first_name=business.first_name,
-            last_name=business.last_name,
-            email=business.email,
-            phone=business.phone,
-            password_hash=password_hash,
-        )
+        try:
+            return await self.guest_repo.create_business(
+                first_name=business.first_name,
+                last_name=business.last_name,
+                email=business.email,
+                phone=business.phone,
+                password_hash=password_hash,
+            )
 
-        return guest
+        except GuestAlreadyExistsError:
+            raise ConflictException(
+                detail="Guest with this email or phone already exists"
+            )

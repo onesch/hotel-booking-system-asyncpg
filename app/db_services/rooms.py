@@ -1,5 +1,5 @@
 import asyncpg
-from fastapi import HTTPException
+from app.exceptions.database import RelatedEntityNotFoundError
 
 from app.db import Database
 
@@ -41,11 +41,8 @@ class RoomRepository:
                 room_type_id,
             )
             return room
-        except asyncpg.exceptions.ForeignKeyViolationError:
-            raise HTTPException(
-                status_code=404,
-                detail="Hotel or room type not found",
-            )
+        except asyncpg.exceptions.ForeignKeyViolationError as e:
+            raise RelatedEntityNotFoundError from e
 
     async def get_by_id(self, id: int) -> dict | None:
         query = """
@@ -107,11 +104,8 @@ class RoomRepository:
 
             return room
 
-        except asyncpg.exceptions.ForeignKeyViolationError:
-            raise HTTPException(
-                status_code=404,
-                detail="Hotel or room type not found",
-            )
+        except asyncpg.exceptions.ForeignKeyViolationError as e:
+            raise RelatedEntityNotFoundError from e
 
     async def delete(self, id: int) -> dict | None:
         query = """

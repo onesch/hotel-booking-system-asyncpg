@@ -1,6 +1,6 @@
-from fastapi import HTTPException
-
 from app.db_services.rooms import RoomRepository
+from app.exceptions.http import NotFoundException
+from app.exceptions.database import RelatedEntityNotFoundError
 from app.schemas.rooms import (
     RoomCreate,
     RoomDelete,
@@ -23,13 +23,18 @@ class RoomService:
         """
         Create a new room.
         """
-        return await self.repo.create(
-            room_number=room.room_number,
-            room_floor=room.room_floor,
-            is_active=room.is_active,
-            hotel_id=room.hotel_id,
-            room_type_id=room.room_type_id,
-        )
+        try:
+            return await self.repo.create(
+                room_number=room.room_number,
+                room_floor=room.room_floor,
+                is_active=room.is_active,
+                hotel_id=room.hotel_id,
+                room_type_id=room.room_type_id,
+            )
+        except RelatedEntityNotFoundError:
+            raise NotFoundException(
+                detail="Hotel or room type not found"
+            )
 
     async def get_by_id(
         self,
@@ -41,10 +46,7 @@ class RoomService:
         room = await self.repo.get_by_id(room_id)
 
         if room is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Room not found",
-            )
+            raise NotFoundException(detail="Room not found")
 
         return room
 
@@ -61,20 +63,22 @@ class RoomService:
         """
         Update room.
         """
-        updated_room = await self.repo.update(
-            id=room.id,
-            room_number=room.room_number,
-            room_floor=room.room_floor,
-            is_active=room.is_active,
-            hotel_id=room.hotel_id,
-            room_type_id=room.room_type_id,
-        )
+        try:
+            updated_room = await self.repo.update(
+                id=room.id,
+                room_number=room.room_number,
+                room_floor=room.room_floor,
+                is_active=room.is_active,
+                hotel_id=room.hotel_id,
+                room_type_id=room.room_type_id,
+            )
+        except RelatedEntityNotFoundError:
+            raise NotFoundException(
+                detail="Hotel or room type not found"
+            )
 
         if updated_room is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Room not found",
-            )
+            raise NotFoundException(detail="Room not found")
 
         return updated_room
 
@@ -88,9 +92,6 @@ class RoomService:
         deleted_room = await self.repo.delete(id=room.id)
 
         if deleted_room is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Room not found",
-            )
+            raise NotFoundException(detail="Room not found")
 
         return deleted_room

@@ -1,6 +1,6 @@
 import pytest
 import asyncpg
-from fastapi import HTTPException
+from app.exceptions.database import RoomAlreadyBookedError
 
 """
 Repository -> raw SQL queries -> PostgreSQL
@@ -45,18 +45,13 @@ async def test_create_booking_conflict(
         asyncpg.exceptions.ExclusionViolationError()
     )
 
-    with pytest.raises(HTTPException) as exc:
+    with pytest.raises(RoomAlreadyBookedError):
         await booking_repository.create(
             guest_id=booking_data["guest_id"],
             room_id=booking_data["room_id"],
             check_in_date=booking_data["check_in_date"],
             check_out_date=booking_data["check_out_date"],
         )
-
-    assert exc.value.status_code == 409
-    assert exc.value.detail == (
-        "Room is already booked for these dates"
-    )
 
 
 @pytest.mark.asyncio
@@ -201,17 +196,12 @@ async def test_update_booking_conflict(
         asyncpg.exceptions.ExclusionViolationError()
     )
 
-    with pytest.raises(HTTPException) as exc:
+    with pytest.raises(RoomAlreadyBookedError):
         await booking_repository.update(
             id=booking_data["id"],
             check_in_date="2026-10-15",
             check_out_date="2026-10-20",
         )
-
-    assert exc.value.status_code == 409
-    assert exc.value.detail == (
-        "Room is already booked for these dates"
-    )
 
 
 @pytest.mark.asyncio

@@ -1,6 +1,8 @@
+import pytest
 import asyncpg
 from fastapi import HTTPException
-import pytest
+
+from app.exceptions.database import GuestAlreadyExistsError
 
 """
 Repository -> roper SQL Queries -> PostgreSQL
@@ -47,7 +49,7 @@ async def test_create_guest_duplicate(guest_repository):
         asyncpg.exceptions.UniqueViolationError()
     )
 
-    with pytest.raises(HTTPException) as exc_info:
+    with pytest.raises(GuestAlreadyExistsError):
         await guest_repository.create(
             first_name="Name",
             last_name="LastName",
@@ -55,11 +57,6 @@ async def test_create_guest_duplicate(guest_repository):
             phone="123456789",
             password_hash="hashed_password",
         )
-
-    assert exc_info.value.status_code == 409
-    assert exc_info.value.detail == (
-        "Guest with this email or phone already exists"
-    )
 
 
 @pytest.mark.asyncio
@@ -108,7 +105,7 @@ async def test_create_business_guest_duplicate(
         asyncpg.exceptions.UniqueViolationError()
     )
 
-    with pytest.raises(HTTPException) as exc:
+    with pytest.raises(GuestAlreadyExistsError):
         await guest_repository.create_business(
             first_name=guest_data["first_name"],
             last_name=guest_data["last_name"],
@@ -116,11 +113,6 @@ async def test_create_business_guest_duplicate(
             phone=guest_data["phone"],
             password_hash="hashed_password",
         )
-
-    assert exc.value.status_code == 409
-    assert exc.value.detail == (
-        "Guest with this email or phone already exists"
-    )
 
 
 @pytest.mark.asyncio

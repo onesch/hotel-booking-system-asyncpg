@@ -1,6 +1,9 @@
-from fastapi import HTTPException
-
 from app.db_services.bookings import BookingRepository
+from app.exceptions.http import (
+    ConflictException,
+    NotFoundException,
+)
+from app.exceptions.database import RoomAlreadyBookedError
 from app.schemas.bookings import (
     BookingCreate,
     BookingDelete,
@@ -24,12 +27,17 @@ class BookingService:
         """
         Create a new booking.
         """
-        return await self.repo.create(
-            guest_id=guest_id,
-            room_id=booking.room_id,
-            check_in_date=booking.check_in_date,
-            check_out_date=booking.check_out_date,
-        )
+        try:
+            return await self.repo.create(
+                guest_id=guest_id,
+                room_id=booking.room_id,
+                check_in_date=booking.check_in_date,
+                check_out_date=booking.check_out_date,
+            )
+        except RoomAlreadyBookedError as e:
+            raise ConflictException(
+                detail="Room is already booked for these dates"
+            ) from e
 
     async def get_by_id(
         self,
@@ -41,10 +49,7 @@ class BookingService:
         booking = await self.repo.get_by_id(id)
 
         if booking is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Booking not found",
-            )
+            raise NotFoundException(detail="Booking not found")
 
         return booking
 
@@ -63,17 +68,19 @@ class BookingService:
         """
         Update booking.
         """
-        updated_booking = await self.repo.update(
-            id=booking.id,
-            check_in_date=booking.check_in_date,
-            check_out_date=booking.check_out_date,
-        )
+        try:
+            updated_booking = await self.repo.update(
+                id=booking.id,
+                check_in_date=booking.check_in_date,
+                check_out_date=booking.check_out_date,
+            )
+        except RoomAlreadyBookedError as e:
+            raise ConflictException(
+                detail="Room is already booked for these dates"
+            ) from e
 
         if updated_booking is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Booking not found",
-            )
+            raise NotFoundException(detail="Booking not found")
 
         return updated_booking
 
@@ -89,9 +96,6 @@ class BookingService:
         )
 
         if deleted_booking is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Booking not found",
-            )
+            raise NotFoundException(detail="Booking not found")
 
         return deleted_booking

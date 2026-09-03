@@ -1,7 +1,7 @@
 import pytest
 
 from app.settings import TEST_DATABASE_URL
-from app.db_services.bookings import BookingRepository
+from app.db_services.guests import GuestRepository
 
 
 @pytest.fixture
@@ -11,4 +11,4 @@ def repository(monkeypatch):
         TEST_DATABASE_URL,
     )
 
-    return BookingRepository()
+    return GuestRepository()

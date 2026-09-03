@@ -1,7 +1,10 @@
 import asyncpg
-from fastapi import HTTPException
 
 from app.db import Database
+from app.exceptions.database import (
+    InvalidRoomTypeError,
+    RoomTypeInUseError,
+)
 
 
 class RoomTypeRepository:
@@ -29,11 +32,8 @@ class RoomTypeRepository:
                 room_type,
             )
 
-        except asyncpg.exceptions.CheckViolationError:
-            raise HTTPException(
-                status_code=400,
-                detail="Invalid room type",
-            )
+        except asyncpg.exceptions.CheckViolationError as e:
+            raise InvalidRoomTypeError from e
 
     async def get_by_id(
         self,
@@ -76,11 +76,8 @@ class RoomTypeRepository:
                 room_type,
             )
 
-        except asyncpg.exceptions.CheckViolationError:
-            raise HTTPException(
-                status_code=400,
-                detail="Invalid room type",
-            )
+        except asyncpg.exceptions.CheckViolationError as e:
+            raise InvalidRoomTypeError from e
 
     async def delete(
         self,
@@ -94,8 +91,5 @@ class RoomTypeRepository:
         try:
             return await self.db.fetchrow(query, id)
 
-        except asyncpg.exceptions.ForeignKeyViolationError:
-            raise HTTPException(
-                status_code=409,
-                detail="Room type is used by one or more rooms",
-            )
+        except asyncpg.exceptions.ForeignKeyViolationError as e:
+            raise RoomTypeInUseError from e
