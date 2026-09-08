@@ -1,5 +1,6 @@
 import pytest
 import asyncpg
+
 from app.exceptions.database import RoomAlreadyBookedError
 
 """

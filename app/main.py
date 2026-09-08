@@ -21,7 +21,7 @@ def create_app() -> FastAPI:
     app.include_router(guests_api_router, prefix="/guests")
     app.include_router(hotels_api_router, prefix="/hotels")
     app.include_router(rooms_api_router, prefix="/rooms")
-    app.include_router(room_types_api_router, prefix="/room_types")
+    app.include_router(room_types_api_router, prefix="/room-types")
     app.include_router(bookings_api_router, prefix="/bookings")
     app.include_router(auth_api_router, prefix="/auth")
 

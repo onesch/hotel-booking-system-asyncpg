@@ -1,6 +1,5 @@
 import pytest
 import asyncpg
-from fastapi import HTTPException
 
 from app.exceptions.database import GuestAlreadyExistsError
 

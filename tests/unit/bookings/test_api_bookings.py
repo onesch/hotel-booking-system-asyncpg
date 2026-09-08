@@ -1,6 +1,5 @@
 import pytest
 from datetime import date
-
 from fastapi import HTTPException
 from httpx import ASGITransport, AsyncClient
 
