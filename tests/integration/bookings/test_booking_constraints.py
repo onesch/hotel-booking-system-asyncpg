@@ -4,7 +4,7 @@ import pytest
 from app.exceptions.database import RoomAlreadyBookedError
 
 
-# ------------ CHECK ------------
+# ----------- CHECK -----------
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
@@ -58,7 +58,7 @@ async def test_booking_invalid_dates(
         )
 
 
-# ----------- EXCLUDE -----------
+# ---------- EXCLUDE ----------
 
 
 @pytest.mark.asyncio
@@ -129,7 +129,7 @@ async def test_booking_no_overlap(
     assert result is not None
 
 
-# ---------- FOREIGN KEY -----------
+# -------- FOREIGN KEY --------
 
 
 @pytest.mark.asyncio
@@ -162,7 +162,7 @@ async def test_booking_fk_room(
         )
 
 
-# -- --------- CASCADE -----------
+# ---------- CASCADE ----------
 
 
 @pytest.mark.asyncio

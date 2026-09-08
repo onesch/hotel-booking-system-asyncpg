@@ -3,7 +3,7 @@ import pytest
 from app.exceptions.database import GuestAlreadyExistsError
 
 
-# --------- UNIQUE -----------
+# ---------- UNIQUE -----------
 
 
 @pytest.mark.asyncio
