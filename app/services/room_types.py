@@ -3,7 +3,7 @@ from app.exceptions.http import (
     NotFoundException,
     ConflictException,
 )
-from app.exceptions.database import RoomTypeInUseError
+from app.exceptions.database import RoomTypeAlreadyExistsError, RoomTypeInUseError
 from app.schemas.room_types import (
     RoomTypeCreate,
     RoomTypeDelete,
@@ -26,7 +26,11 @@ class RoomTypeService:
         """
         Create a new room type.
         """
-        return await self.repo.create(room_type=room_type.room_type)
+        try:
+            return await self.repo.create(room_type=room_type.room_type)
+
+        except RoomTypeAlreadyExistsError:
+            raise ConflictException(detail="Room type already exists")
 
     async def get_by_id(
         self,
@@ -55,10 +59,13 @@ class RoomTypeService:
         """
         Update room type.
         """
-        updated_room_type = await self.repo.update(
-            id=room_type.id,
-            room_type=room_type.room_type,
-        )
+        try:
+            updated_room_type = await self.repo.update(
+                id=room_type.id,
+                room_type=room_type.room_type,
+            )
+        except RoomTypeAlreadyExistsError:
+            raise ConflictException(detail="Room type already exists")
 
         if updated_room_type is None:
             raise NotFoundException(detail="Room type not found")

@@ -2,7 +2,7 @@ import pytest
 import asyncpg
 
 from app.exceptions.database import (
-    InvalidRoomTypeError,
+    RoomTypeAlreadyExistsError,
     RoomTypeInUseError,
 )
 
@@ -39,16 +39,16 @@ async def test_create_room_type(
 
 
 @pytest.mark.asyncio
-async def test_create_room_type_invalid(
+async def test_create_room_type_already_exists(
     room_type_repository,
 ):
     room_type_repository.db.fetchrow.side_effect = (
-        asyncpg.exceptions.CheckViolationError()
+        asyncpg.exceptions.UniqueViolationError()
     )
 
-    with pytest.raises(InvalidRoomTypeError):
+    with pytest.raises(RoomTypeAlreadyExistsError):
         await room_type_repository.create(
-            room_type="Invalid",
+            room_type="already_exists",
         )
 
 
@@ -192,17 +192,17 @@ async def test_update_room_type_not_found(
 
 
 @pytest.mark.asyncio
-async def test_update_room_type_invalid(
+async def test_update_room_type_already_exists(
     room_type_repository,
 ):
     room_type_repository.db.fetchrow.side_effect = (
-        asyncpg.exceptions.CheckViolationError()
+        asyncpg.exceptions.UniqueViolationError()
     )
 
-    with pytest.raises(InvalidRoomTypeError):
+    with pytest.raises(RoomTypeAlreadyExistsError):
         await room_type_repository.update(
             id=1,
-            room_type="Invalid",
+            room_type="already_exists",
         )
 
 

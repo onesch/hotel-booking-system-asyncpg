@@ -1,7 +1,10 @@
 import pytest
 from fastapi import HTTPException
 
-from app.exceptions.database import RoomTypeInUseError
+from app.exceptions.database import (
+    RoomTypeAlreadyExistsError,
+    RoomTypeInUseError,
+)
 from app.schemas.room_types import (
     RoomTypeCreate,
     RoomTypeUpdate,
@@ -29,6 +32,32 @@ async def test_create_room_type(
     )
 
     assert result == room_type_data
+
+    room_type_service.repo.create.assert_awaited_once_with(
+        room_type=room_type_data["room_type"],
+    )
+
+
+@pytest.mark.asyncio
+async def test_create_room_type_already_exists(
+    room_type_service,
+    room_type_data,
+):
+    room_type_service.repo.create.side_effect = (
+        RoomTypeAlreadyExistsError()
+    )
+
+    room_type = RoomTypeCreate(
+        room_type=room_type_data["room_type"],
+    )
+
+    with pytest.raises(HTTPException) as exc:
+        await room_type_service.create(
+            room_type=room_type,
+        )
+
+    assert exc.value.status_code == 409
+    assert exc.value.detail == "Room type already exists"
 
     room_type_service.repo.create.assert_awaited_once_with(
         room_type=room_type_data["room_type"],
@@ -108,6 +137,32 @@ async def test_update_room_type(
     result = await room_type_service.update(room_type)
 
     assert result == updated_room_type
+
+    room_type_service.repo.update.assert_awaited_once_with(
+        id=room_type_data["id"],
+        room_type="Updated",
+    )
+
+
+@pytest.mark.asyncio
+async def test_update_room_type_already_exists(
+    room_type_service,
+    room_type_data,
+):
+    room_type_service.repo.update.side_effect = (
+        RoomTypeAlreadyExistsError()
+    )
+
+    room_type = RoomTypeUpdate(
+        id=room_type_data["id"],
+        room_type="Updated",
+    )
+
+    with pytest.raises(HTTPException) as exc:
+        await room_type_service.update(room_type)
+
+    assert exc.value.status_code == 409
+    assert exc.value.detail == "Room type already exists"
 
     room_type_service.repo.update.assert_awaited_once_with(
         id=room_type_data["id"],

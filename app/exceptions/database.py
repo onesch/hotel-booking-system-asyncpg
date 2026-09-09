@@ -4,7 +4,7 @@ class GuestAlreadyExistsError(Exception):
 class GuestNotFoundError(Exception):
     pass
 
-class InvalidRoomTypeError(Exception):
+class RoomTypeAlreadyExistsError(Exception):
     pass
 
 class RoomTypeInUseError(Exception):

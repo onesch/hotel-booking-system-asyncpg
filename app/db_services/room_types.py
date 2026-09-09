@@ -2,7 +2,7 @@ import asyncpg
 
 from app.db import Database
 from app.exceptions.database import (
-    InvalidRoomTypeError,
+    RoomTypeAlreadyExistsError,
     RoomTypeInUseError,
 )
 
@@ -32,8 +32,8 @@ class RoomTypeRepository:
                 room_type,
             )
 
-        except asyncpg.exceptions.CheckViolationError as e:
-            raise InvalidRoomTypeError from e
+        except asyncpg.exceptions.UniqueViolationError as e:
+            raise RoomTypeAlreadyExistsError from e
 
     async def get_by_id(
         self,
@@ -76,8 +76,8 @@ class RoomTypeRepository:
                 room_type,
             )
 
-        except asyncpg.exceptions.CheckViolationError as e:
-            raise InvalidRoomTypeError from e
+        except asyncpg.exceptions.UniqueViolationError as e:
+            raise RoomTypeAlreadyExistsError from e
 
     async def delete(
         self,
