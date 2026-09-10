@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.middlewares import RateLimitMiddleware
 from app.routers.guests import router as guests_api_router
 from app.routers.hotels import router as hotels_api_router
 from app.routers.rooms import router as rooms_api_router
@@ -16,6 +17,9 @@ def create_app() -> FastAPI:
         FastAPI: Configured FastAPI app instance.
     """
     app = FastAPI()
+
+    # middlewares
+    app.add_middleware(RateLimitMiddleware)
 
     # routers
     app.include_router(guests_api_router, prefix="/guests")
