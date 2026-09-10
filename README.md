@@ -9,25 +9,35 @@ CREATE DATABASE hotel_booking_system;
 
 #### 2. Configure environment variables
 
-Create a `.env` file:
+Create a `.env` file and configure the required environment variables from `.env.example`.
 
-```env
-DATABASE_URL=postgresql://<username>:<password>@localhost:5432/hotel_booking_system
+#### 3. Configure Redis
+
+Open the Redis configuration file:
+```
+/etc/redis/redis.conf
 ```
 
-#### 3. Apply all database migrations
+Find the requirepass option and set the Redis password:
+```
+requirepass <password>
+```
+> Make sure the password matches the Redis password specified in your `.env` file.
+> Restart Redis after changing the configuration.
+
+#### 4. Apply all database migrations
 
 ```bash
 alembic upgrade head
 ```
 
-#### 4. Populate the database with sample data
+#### 5. Populate the database with sample data
 
 ```bash
 psql -U <username> -d hotel_booking_system -f faker_values.sql
 ```
 
-#### 5. Run the application
+#### 6. Run the application
 
 ```bash
 make dev
