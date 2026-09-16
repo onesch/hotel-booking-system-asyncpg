@@ -1,7 +1,7 @@
 [project]
-name = "hotel-booking-system-psycopg2"
+name = "hotel-booking-system-asyncpg"
 version = "0.1.0"
-description = "Add your description here"
+description = "Hotel booking system."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -10,9 +10,7 @@ dependencies = [
     "email-validator>=2.3.0",
     "fastapi>=0.140.13",
     "passlib>=1.7.4",
-    "psycopg2-binary>=2.9.12",
     "pydantic>=2.13.4",
-    "pytest-cov>=7.1.0",
     "python-dotenv>=1.2.2",
     "redis>=8.1.0",
     "uvicorn>=0.52.0",
@@ -25,5 +23,11 @@ dev = [
     "httpx>=0.28.1",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
+    "pytest-cov>=7.1.0",
     "sqlfluff>=4.2.2",
 ]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+asyncio_default_test_loop_scope = "function"

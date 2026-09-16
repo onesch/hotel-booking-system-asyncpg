@@ -18,6 +18,10 @@ def create_app() -> FastAPI:
     """
     app = FastAPI()
 
+    @app.get("/health")
+    async def health():
+        return {"status": "ok"}
+
     # middlewares
     app.add_middleware(RateLimitMiddleware)
 

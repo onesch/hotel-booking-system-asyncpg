@@ -16,14 +16,14 @@ from app.exceptions.database import RoomAlreadyBookedError
     ],
 )
 async def test_booking_valid_dates(
-    repository,
+    integration_booking_repository,
     clean_database,
     guest,
     room,
     check_in,
     check_out,
 ):
-    result = await repository.create(
+    result = await integration_booking_repository.create(
         guest_id=guest["id"],
         room_id=room["id"],
         check_in_date=check_in,
@@ -42,7 +42,7 @@ async def test_booking_valid_dates(
     ],
 )
 async def test_booking_invalid_dates(
-    repository,
+    integration_booking_repository,
     clean_database,
     guest,
     room,
@@ -50,7 +50,7 @@ async def test_booking_invalid_dates(
     check_out,
 ):
     with pytest.raises(Exception):
-        await repository.create(
+        await integration_booking_repository.create(
             guest_id=guest["id"],
             room_id=room["id"],
             check_in_date=check_in,
@@ -71,7 +71,7 @@ async def test_booking_invalid_dates(
     ],
 )
 async def test_booking_overlap_conflict(
-    repository,
+    integration_booking_repository,
     clean_database,
     guest,
     second_guest,
@@ -79,7 +79,7 @@ async def test_booking_overlap_conflict(
     check_in,
     check_out,
 ):
-    await repository.create(
+    await integration_booking_repository.create(
         guest_id=guest["id"],
         room_id=room["id"],
         check_in_date=date(2026, 10, 10),
@@ -87,7 +87,7 @@ async def test_booking_overlap_conflict(
     )
 
     with pytest.raises(RoomAlreadyBookedError):
-        await repository.create(
+        await integration_booking_repository.create(
             guest_id=second_guest["id"],
             room_id=room["id"],
             check_in_date=check_in,
@@ -104,7 +104,7 @@ async def test_booking_overlap_conflict(
     ],
 )
 async def test_booking_no_overlap(
-    repository,
+    integration_booking_repository,
     clean_database,
     guest,
     second_guest,
@@ -112,14 +112,14 @@ async def test_booking_no_overlap(
     check_in,
     check_out,
 ):
-    await repository.create(
+    await integration_booking_repository.create(
         guest_id=guest["id"],
         room_id=room["id"],
         check_in_date=date(2026, 10, 10),
         check_out_date=date(2026, 10, 15),
     )
 
-    result = await repository.create(
+    result = await integration_booking_repository.create(
         guest_id=second_guest["id"],
         room_id=room["id"],
         check_in_date=check_in,
@@ -134,12 +134,12 @@ async def test_booking_no_overlap(
 
 @pytest.mark.asyncio
 async def test_booking_fk_guest(
-    repository,
+    integration_booking_repository,
     clean_database,
     room,
 ):
     with pytest.raises(asyncpg.exceptions.ForeignKeyViolationError):
-        await repository.create(
+        await integration_booking_repository.create(
             guest_id=999999,
             room_id=room["id"],
             check_in_date=date(2026, 10, 10),
@@ -149,12 +149,12 @@ async def test_booking_fk_guest(
 
 @pytest.mark.asyncio
 async def test_booking_fk_room(
-    repository,
+    integration_booking_repository,
     clean_database,
     guest,
 ):
     with pytest.raises(asyncpg.exceptions.ForeignKeyViolationError):
-        await repository.create(
+        await integration_booking_repository.create(
             guest_id=guest["id"],
             room_id=999999,
             check_in_date=date(2026, 10, 10),

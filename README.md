@@ -92,3 +92,33 @@ Check that the tables were created:
 ```bash
 \dt
 ```
+
+#### 4. Configure Redis for tests
+
+The test suite uses a separate Redis logical database to keep test data isolated from the production Redis database.
+
+Configure TEST_REDIS_URL in your .env file:
+
+```
+TEST_REDIS_URL=redis://:<password>@<host>:<port>/1
+```
+
+The regular application can use a different Redis database, for example:
+
+```
+REDIS_URL=redis://:<password>@<host>:<port>/15
+```
+
+> The database number at the end of the Redis URI (/1, /15, etc.) selects a separate logical Redis database.
+
+> Make sure `TEST_REDIS_URL` points to a different Redis database than `REDIS_URL`. The test Redis database is cleared before and after tests to prevent state from leaking between test cases.
+
+> For E2E tests, the test server is also started with `TEST_REDIS_URL`, so rate limiter data is never written to the production Redis database.
+
+#### 5. Run tests
+
+Run the full test suite:
+
+```bash
+uv run pytest
+```

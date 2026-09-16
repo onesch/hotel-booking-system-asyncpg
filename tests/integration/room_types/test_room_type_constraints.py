@@ -10,13 +10,17 @@ from app.exceptions.database import (
 
 @pytest.mark.asyncio
 async def test_create_room_type_duplicate(
-    repository,
+    integration_room_type_repository,
     clean_database,
 ):
-    await repository.create(room_type="Standard")
+    await integration_room_type_repository.create(
+        room_type="Standard"
+    )
 
     with pytest.raises(RoomTypeAlreadyExistsError):
-        await repository.create(room_type="Standard")
+        await integration_room_type_repository.create(
+            room_type="Standard"
+        )
 
 
 # --------- RESTRICT -----------
@@ -24,12 +28,14 @@ async def test_create_room_type_duplicate(
 
 @pytest.mark.asyncio
 async def test_delete_room_type_restricted_when_used(
-    repository,
+    integration_room_type_repository,
     test_db,
     clean_database,
     hotel,
 ):
-    room_type = await repository.create(room_type="Standard")
+    room_type = await integration_room_type_repository.create(
+        room_type="Standard"
+    )
 
     await test_db.fetchrow(
         """
@@ -51,4 +57,6 @@ async def test_delete_room_type_restricted_when_used(
     )
 
     with pytest.raises(RoomTypeInUseError):
-        await repository.delete(id=room_type["id"])
+        await integration_room_type_repository.delete(
+            id=room_type["id"]
+        )

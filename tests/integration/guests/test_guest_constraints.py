@@ -8,10 +8,10 @@ from app.exceptions.database import GuestAlreadyExistsError
 
 @pytest.mark.asyncio
 async def test_create_guest_with_duplicate_email(
-    repository,
+    integration_guest_repository,
     clean_database,
 ):
-    await repository.create(
+    await integration_guest_repository.create(
         first_name="Test1",
         last_name="User1",
         email="test1@example.com",
@@ -20,7 +20,7 @@ async def test_create_guest_with_duplicate_email(
     )
 
     with pytest.raises(GuestAlreadyExistsError):
-        await repository.create(
+        await integration_guest_repository.create(
             first_name="Test2",
             last_name="User2",
             email="test1@example.com",
@@ -31,10 +31,10 @@ async def test_create_guest_with_duplicate_email(
 
 @pytest.mark.asyncio
 async def test_create_guest_with_duplicate_phone(
-    repository,
+    integration_guest_repository,
     clean_database,
 ):
-    await repository.create(
+    await integration_guest_repository.create(
         first_name="Test1",
         last_name="User1",
         email="test1@example.com",
@@ -43,7 +43,7 @@ async def test_create_guest_with_duplicate_phone(
     )
 
     with pytest.raises(GuestAlreadyExistsError):
-        await repository.create(
+        await integration_guest_repository.create(
             first_name="Test2",
             last_name="User2",
             email="test2@example.com",
