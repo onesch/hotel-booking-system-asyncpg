@@ -9,25 +9,35 @@ CREATE DATABASE hotel_booking_system;
 
 #### 2. Configure environment variables
 
-Create a `.env` file:
+Create a `.env` file and configure the required environment variables from `.env.example`.
 
-```env
-DATABASE_URL=postgresql://<username>:<password>@localhost:5432/hotel_booking_system
+#### 3. Configure Redis
+
+Open the Redis configuration file:
+```
+/etc/redis/redis.conf
 ```
 
-#### 3. Apply all database migrations
+Find the requirepass option and set the Redis password:
+```
+requirepass <password>
+```
+> Make sure the password matches the Redis password specified in your `.env` file.
+> Restart Redis after changing the configuration.
+
+#### 4. Apply all database migrations
 
 ```bash
 alembic upgrade head
 ```
 
-#### 4. Populate the database with sample data
+#### 5. Populate the database with sample data
 
 ```bash
 psql -U <username> -d hotel_booking_system -f faker_values.sql
 ```
 
-#### 5. Run the application
+#### 6. Run the application
 
 ```bash
 make dev
@@ -81,4 +91,34 @@ Check that the tables were created:
 
 ```bash
 \dt
+```
+
+#### 4. Configure Redis for tests
+
+The test suite uses a separate Redis logical database to keep test data isolated from the production Redis database.
+
+Configure TEST_REDIS_URL in your .env file:
+
+```
+TEST_REDIS_URL=redis://:<password>@<host>:<port>/1
+```
+
+The regular application can use a different Redis database, for example:
+
+```
+REDIS_URL=redis://:<password>@<host>:<port>/15
+```
+
+> The database number at the end of the Redis URI (/1, /15, etc.) selects a separate logical Redis database.
+
+> Make sure `TEST_REDIS_URL` points to a different Redis database than `REDIS_URL`. The test Redis database is cleared before and after tests to prevent state from leaking between test cases.
+
+> For E2E tests, the test server is also started with `TEST_REDIS_URL`, so rate limiter data is never written to the production Redis database.
+
+#### 5. Run tests
+
+Run the full test suite:
+
+```bash
+uv run pytest
 ```
