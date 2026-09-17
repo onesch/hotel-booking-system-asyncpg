@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock
 from app.main import app
 from app.services.guests import GuestService
 from app.db_services.guests import GuestRepository
-from app.settings import TEST_DATABASE_URL
+from app.settings import settings
 from app.dependencies.auth import (
     get_current_guest,
     require_business,
@@ -49,8 +49,9 @@ def integration_guest_repository(monkeypatch):
     Returns a GuestRepository configured to use the test database.
     """
     monkeypatch.setattr(
-        "app.db.DATABASE_URL",
-        TEST_DATABASE_URL,
+        settings,
+        "database_url",
+        settings.test_database_url,
     )
 
     return GuestRepository()

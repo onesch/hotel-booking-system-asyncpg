@@ -11,6 +11,7 @@ dependencies = [
     "fastapi>=0.140.13",
     "passlib>=1.7.4",
     "pydantic>=2.13.4",
+    "pydantic-settings>=2.15.0",
     "python-dotenv>=1.2.2",
     "redis>=8.1.0",
     "uvicorn>=0.52.0",

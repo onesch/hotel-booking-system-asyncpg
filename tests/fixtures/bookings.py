@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock
 
 from app.services.bookings import BookingService
 from app.db_services.bookings import BookingRepository
-from app.settings import TEST_DATABASE_URL
+from app.settings import settings
 
 
 @pytest.fixture
@@ -47,8 +47,9 @@ def integration_booking_repository(monkeypatch):
     Returns a BookingRepository configured to use the test database.
     """
     monkeypatch.setattr(
-        "app.db.DATABASE_URL",
-        TEST_DATABASE_URL,
+        settings,
+        "database_url",
+        settings.test_database_url,
     )
 
     return BookingRepository()

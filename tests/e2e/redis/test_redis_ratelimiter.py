@@ -1,7 +1,7 @@
 import httpx
 import pytest
 
-from app.settings import MAX_REQUESTS, WINDOW_SECONDS
+from app.settings import settings
 
 
 @pytest.mark.asyncio
@@ -12,7 +12,7 @@ async def test_rate_limit_blocks_after_max_requests(
 
     async with httpx.AsyncClient() as client:
         # Requests within the limit must be allowed.
-        for _ in range(MAX_REQUESTS):
+        for _ in range(settings.max_requests):
             response = await client.get(url)
 
             assert response.status_code == 200
@@ -27,7 +27,7 @@ async def test_rate_limit_blocks_after_max_requests(
 
     assert body["detail"] == "Too Many Requests"
     assert retry_after == body["retry_after_seconds"]
-    assert 0 < retry_after <= WINDOW_SECONDS
+    assert 0 < retry_after <= settings.window_seconds
 
 
 @pytest.mark.asyncio
@@ -39,13 +39,13 @@ async def test_health_endpoint_is_not_rate_limited(
 
     async with httpx.AsyncClient() as client:
         # Health requests must remain available beyond the normal limit.
-        for _ in range(MAX_REQUESTS + 1):
+        for _ in range(settings.max_requests + 1):
             response = await client.get(health_url)
 
             assert response.status_code == 200
 
         # Health requests must not consume the guests request limit.
-        for _ in range(MAX_REQUESTS):
+        for _ in range(settings.max_requests):
             response = await client.get(guests_url)
 
             assert response.status_code == 200

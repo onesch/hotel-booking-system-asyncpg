@@ -1,7 +1,7 @@
 import asyncpg
 from typing import Any
 
-from app.settings import DATABASE_URL
+from app.settings import settings
 
 
 class Database:
@@ -13,7 +13,7 @@ class Database:
     """
 
     def __init__(self):
-        self.database_url = DATABASE_URL
+        self.database_url = settings.database_url
 
         if not self.database_url:
             raise ValueError("DATABASE_URL is not set")

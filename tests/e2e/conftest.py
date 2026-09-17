@@ -5,7 +5,7 @@ import time
 import httpx
 import pytest
 
-from app.settings import TEST_REDIS_URL
+from app.settings import settings
 
 
 def wait_for_server(
@@ -46,7 +46,7 @@ def run_server():
     env = os.environ.copy()
 
     # Force the E2E server to use the test Redis database.
-    env["REDIS_URL"] = TEST_REDIS_URL
+    env["REDIS_URL"] = settings.test_redis_url
 
     # Start the FastAPI application through Uvicorn.
     process = subprocess.Popen(

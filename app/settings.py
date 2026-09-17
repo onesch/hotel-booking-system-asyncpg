@@ -1,19 +1,24 @@
-import os
-from dotenv import load_dotenv
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-load_dotenv()
 
-# Database
+class Settings(BaseSettings):
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
+    # Database
+    database_url: str
+    test_database_url: str
 
-# Redis
+    # Redis
+    redis_url: str
+    test_redis_url: str
 
-REDIS_URL = os.getenv("REDIS_URL")
-TEST_REDIS_URL = os.getenv("TEST_REDIS_URL")
+    # Rate limiting
+    max_requests: int = 10
+    window_seconds: int = 60
 
-# Rate limiting
+    model_config = SettingsConfigDict(
+        env_file='.env',
+        env_file_encoding='utf-8',
+        extra='ignore',
+    )
 
-MAX_REQUESTS: int = 10
-WINDOW_SECONDS: int = 60
+settings = Settings()

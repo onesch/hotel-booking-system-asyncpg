@@ -1,8 +1,8 @@
 from redis.asyncio import Redis
 
-from app.settings import REDIS_URL
+from app.settings import settings
 
 redis = Redis.from_url(
-    REDIS_URL,
+    settings.redis_url,
     decode_responses=True,
 )
