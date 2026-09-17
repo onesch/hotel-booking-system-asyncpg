@@ -1,13 +1,13 @@
 import pytest_asyncio
 from redis.asyncio import Redis
 
-from app.settings import TEST_REDIS_URL
+from app.settings import settings
 
 
 @pytest_asyncio.fixture(autouse=True)
 async def test_redis(monkeypatch):
     test_redis_client = Redis.from_url(
-        TEST_REDIS_URL,
+        settings.test_redis_url,
         decode_responses=True,
     )
 

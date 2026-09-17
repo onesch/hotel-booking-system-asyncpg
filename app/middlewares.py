@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.redis import redis
-from app.settings import MAX_REQUESTS, WINDOW_SECONDS
+from app.settings import settings
 
 
 RATE_LIMIT_SCRIPT = """
@@ -35,11 +35,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             RATE_LIMIT_SCRIPT,
             1,
             key,
-            WINDOW_SECONDS,
+            settings.window_seconds,
         )
 
         # Block requests that exceed the configured limit.
-        if current_count > MAX_REQUESTS:
+        if current_count > settings.max_requests:
             ttl = await redis.ttl(key)
 
             return JSONResponse(

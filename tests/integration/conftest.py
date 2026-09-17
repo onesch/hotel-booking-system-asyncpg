@@ -1,12 +1,12 @@
 import asyncpg
 import pytest_asyncio
 
-from app.settings import TEST_DATABASE_URL
+from app.settings import settings
 
 
 @pytest_asyncio.fixture
 async def test_db():
-    conn = await asyncpg.connect(TEST_DATABASE_URL)
+    conn = await asyncpg.connect(settings.test_database_url)
 
     try:
         yield conn

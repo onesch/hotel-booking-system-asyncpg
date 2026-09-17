@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock
 
 from app.services.room_types import RoomTypeService
 from app.db_services.room_types import RoomTypeRepository
-from app.settings import TEST_DATABASE_URL
+from app.settings import settings
 
 
 @pytest.fixture
@@ -42,8 +42,9 @@ def integration_room_type_repository(monkeypatch):
     Returns a RoomTypeRepository configured to use the test database.
     """
     monkeypatch.setattr(
-        "app.db.DATABASE_URL",
-        TEST_DATABASE_URL,
+        settings,
+        "database_url",
+        settings.test_database_url,
     )
 
     return RoomTypeRepository()

@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock
 
 from app.services.hotels import HotelService
 from app.db_services.hotels import HotelRepository
-from app.settings import TEST_DATABASE_URL
+from app.settings import settings
 
 
 @pytest.fixture
@@ -44,8 +44,9 @@ def integration_hotel_repository(monkeypatch):
     Returns a HotelRepository configured to use the test database.
     """
     monkeypatch.setattr(
-        "app.db.DATABASE_URL",
-        TEST_DATABASE_URL,
+        settings,
+        "database_url",
+        settings.test_database_url,
     )
 
     return HotelRepository()
