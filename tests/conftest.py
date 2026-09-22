@@ -4,4 +4,5 @@ pytest_plugins = [
     "tests.fixtures.hotels",
     "tests.fixtures.bookings",
     "tests.fixtures.room_types",
+    "tests.fixtures.rooms",
 ]
