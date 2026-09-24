@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends
 
 from app.services.hotels import HotelService
