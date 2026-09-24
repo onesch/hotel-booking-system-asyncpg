@@ -35,18 +35,18 @@ class HotelAnalyticsRepository():
         self,
         hotel_id: int,
     ) -> list[dict[str, Any]]:
-        '''
         query = """--sql
             SELECT
-                DATE_TRUNC('month', check_in_date) AS month,
-                COUNT(*) AS booking_count
-            FROM bookings
-            WHERE hotel_id = $1  # ! add hotel_id in table bookings
-            GROUP BY DATE_TRUNC('month', check_in_date)
+                DATE_TRUNC('month', b.check_in_date) AS month,
+                COUNT(b.id) AS booking_count
+            FROM bookings AS b
+            INNER JOIN rooms AS r
+                ON r.id = b.room_id
+            WHERE r.hotel_id = $1
+            GROUP BY DATE_TRUNC('month', b.check_in_date)
             ORDER BY month;
         """
         return await self.db.fetch(query, hotel_id)
-        '''
 
     async def room_type_popularity(
         self,
