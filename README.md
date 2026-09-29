@@ -1,3 +1,7 @@
+![coverage](https://img.shields.io/badge/Coverage-91%25-green)
+![codeclimane](https://img.shields.io/badge/CodeClimate-A-cyan)
+![python](https://img.shields.io/badge/Python-3.12.3-blue)
+
 A backend project that demonstrates the business logic of a hotel booking system using PostgreSQL. Focuses on database design, raw SQL query writing, relationships between entities, CRUD operations, transactions, and asynchronous database access with asyncpg.
 
 ## Guide
