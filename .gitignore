@@ -1,5 +1,18 @@
 # Python-generated files
 __pycache__/
+.pytest_cache/
 
 # Virtual environments
 .venv
+.env
+.env.test
+.vscode
+
+# Dev
+TODO.md
+
+# Tests
+coverage.lcov
+.coverage
+htmlcov/
+reports/

@@ -1,0 +1,128 @@
+![coverage](https://img.shields.io/badge/Coverage-91%25-green)
+![codeclimane](https://img.shields.io/badge/CodeClimate-A-cyan)
+![python](https://img.shields.io/badge/Python-3.12.3-blue)
+
+A backend project that demonstrates the business logic of a hotel booking system using PostgreSQL. Focuses on database design, raw SQL query writing, relationships between entities, CRUD operations, transactions, and asynchronous database access with asyncpg.
+
+## Guide
+#### 1. Create the PostgreSQL database
+
+```sql
+CREATE DATABASE hotel_booking_system;
+```
+
+#### 2. Configure environment variables
+
+Create a `.env` file and configure the required environment variables from `.env.example`.
+
+#### 3. Configure Redis
+
+Open the Redis configuration file:
+```
+/etc/redis/redis.conf
+```
+
+Find the requirepass option and set the Redis password:
+```
+requirepass <password>
+```
+> Make sure the password matches the Redis password specified in your `.env` file.
+> Restart Redis after changing the configuration.
+
+#### 4. Apply all database migrations
+
+```bash
+alembic upgrade head
+```
+
+#### 5. Populate the database with sample data
+
+```bash
+psql -U <username> -d hotel_booking_system -f faker_values.sql
+```
+
+#### 6. Run the application
+
+```bash
+make dev
+```
+
+## Testing
+
+The project uses a separate PostgreSQL database for integration tests.
+
+#### 1. Create a test database
+
+Open PostgreSQL:
+```bash
+psql -U <username>
+```
+Create a separate database owned by your PostgreSQL user:
+```sql
+CREATE DATABASE <test_db_name> OWNER <username>;
+```
+
+#### 2. Apply migrations to the empty test database
+
+Run all Alembic migrations against the test database:
+
+```bash
+alembic -x db_url='postgresql://<username>:<password>@localhost/<test_db_name>' upgrade head
+```
+> This creates the complete schema in the test database, including tables, foreign keys, constraints, and extensions defined by the migration history.
+
+⚠️ The Alembic **`env.py` must be configured** to read the database URL passed through the -x argument.
+
+Use the following configuration:
+```python
+db_url = context.get_x_argument(as_dictionary=True).get("db_url")
+
+config.set_main_option(
+    "sqlalchemy.url",
+    db_url or os.getenv("DATABASE_URL")
+)
+```
+> This allows Alembic to use the database URL provided through -x db_url. If no -x db_url argument is provided, it falls back to the DATABASE_URL environment variable.
+
+#### 3. Verify the database schema
+
+Connect to the test database:
+```bash
+psql -U <username> -d <test_db_name>
+```
+
+Check that the tables were created:
+
+```bash
+\dt
+```
+
+#### 4. Configure Redis for tests
+
+The test suite uses a separate Redis logical database to keep test data isolated from the production Redis database.
+
+Configure TEST_REDIS_URL in your .env file:
+
+```
+TEST_REDIS_URL=redis://:<password>@<host>:<port>/1
+```
+
+The regular application can use a different Redis database, for example:
+
+```
+REDIS_URL=redis://:<password>@<host>:<port>/15
+```
+
+> The database number at the end of the Redis URI (/1, /15, etc.) selects a separate logical Redis database.
+
+> Make sure `TEST_REDIS_URL` points to a different Redis database than `REDIS_URL`. The test Redis database is cleared before and after tests to prevent state from leaking between test cases.
+
+> For E2E tests, the test server is also started with `TEST_REDIS_URL`, so rate limiter data is never written to the production Redis database.
+
+#### 5. Run tests
+
+Run the full test suite:
+
+```bash
+uv run pytest
+```

@@ -1,0 +1,40 @@
+from fastapi import FastAPI
+
+from app.middlewares import RateLimitMiddleware
+from app.routers.guests import router as guests_api_router
+from app.routers.hotels import router as hotels_api_router
+from app.routers.rooms import router as rooms_api_router
+from app.routers.room_types import router as room_types_api_router
+from app.routers.bookings import router as bookings_api_router
+from app.routers.auth import router as auth_api_router
+from app.routers.analytics.hotels import router as hotel_analytics_router
+
+
+def create_app() -> FastAPI:
+    """
+    Function for create FastAPI app instance.
+
+    Returns:
+        FastAPI: Configured FastAPI app instance.
+    """
+    app = FastAPI()
+
+    @app.get("/health")
+    async def health():
+        return {"status": "ok"}
+
+    # middlewares
+    app.add_middleware(RateLimitMiddleware)
+
+    # routers
+    app.include_router(guests_api_router, prefix="/guests")
+    app.include_router(hotels_api_router, prefix="/hotels")
+    app.include_router(rooms_api_router, prefix="/rooms")
+    app.include_router(room_types_api_router, prefix="/room-types")
+    app.include_router(bookings_api_router, prefix="/bookings")
+    app.include_router(auth_api_router, prefix="/auth")
+    app.include_router(hotel_analytics_router, prefix="/hotel-analytics")
+
+    return app
+
+app = create_app()

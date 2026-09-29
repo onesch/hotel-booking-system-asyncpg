@@ -1,0 +1,95 @@
+import asyncpg
+
+from app.db import Database
+from app.exceptions.database import (
+    RoomTypeAlreadyExistsError,
+    RoomTypeInUseError,
+)
+
+
+class RoomTypeRepository:
+    """
+    Class for managing room types in the database.
+    """
+
+    def __init__(self):
+        self.db = Database()
+
+    async def create(
+        self,
+        room_type: str,
+    ) -> dict | None:
+        query = """
+            INSERT INTO room_types (
+                room_type
+            )
+            VALUES ($1)
+            RETURNING *;
+        """
+        try:
+            return await self.db.fetchrow(
+                query,
+                room_type,
+            )
+
+        except asyncpg.exceptions.UniqueViolationError as e:
+            raise RoomTypeAlreadyExistsError from e
+
+    async def get_by_id(
+        self,
+        room_type_id: int,
+    ) -> dict | None:
+        query = """
+            SELECT
+                id,
+                room_type
+            FROM room_types
+            WHERE id = $1;
+        """
+        return await self.db.fetchrow(query, room_type_id)
+
+    async def get_all(self) -> list[dict]:
+        query = """
+            SELECT
+                id,
+                room_type
+            FROM room_types;
+        """
+        return await self.db.fetch(query)
+
+    async def update(
+        self,
+        id: int,
+        room_type: str | None,
+    ) -> dict | None:
+        query = """
+            UPDATE room_types
+            SET
+                room_type = COALESCE($2, room_type)
+            WHERE id = $1
+            RETURNING *;
+        """
+        try:
+            return await self.db.fetchrow(
+                query,
+                id,
+                room_type,
+            )
+
+        except asyncpg.exceptions.UniqueViolationError as e:
+            raise RoomTypeAlreadyExistsError from e
+
+    async def delete(
+        self,
+        id: int,
+    ) -> dict | None:
+        query = """
+            DELETE FROM room_types
+            WHERE id = $1
+            RETURNING *;
+        """
+        try:
+            return await self.db.fetchrow(query, id)
+
+        except asyncpg.exceptions.ForeignKeyViolationError as e:
+            raise RoomTypeInUseError from e
