@@ -1,12 +1,13 @@
+import asyncio
 import os
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -17,9 +18,18 @@ config = context.config
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 db_url = context.get_x_argument(as_dictionary=True).get("db_url")
+db_url = db_url or os.getenv("DATABASE_URL")
+
+if db_url.startswith("postgresql://"):
+    db_url = db_url.replace(
+        "postgresql://",
+        "postgresql+asyncpg://",
+        1,
+    )
+
 config.set_main_option(
     "sqlalchemy.url",
-    db_url or os.getenv("DATABASE_URL")
+    db_url,
 )
 
 if config.config_file_name is not None:
@@ -42,7 +52,7 @@ def run_migrations_offline() -> None:
 
     This configures the context with just a URL
     and not an Engine, though an Engine is acceptable
-    here as well.  By skipping the Engine creation
+    here as well. By skipping the Engine creation
     we don't even need a DBAPI to be available.
 
     Calls to context.execute() here emit the given string to the
@@ -50,6 +60,7 @@ def run_migrations_offline() -> None:
 
     """
     url = config.get_main_option("sqlalchemy.url")
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -61,26 +72,55 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
+def do_run_migrations(connection) -> None:
+    """Run migrations with an established database connection.
 
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
+    This configures the Alembic context with the given connection
+    and executes all pending migrations inside a transaction.
 
     """
-    connectable = engine_from_config(
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+async def run_async_migrations() -> None:
+    """Run migrations using an asynchronous SQLAlchemy engine.
+
+    This creates an AsyncEngine from the Alembic configuration,
+    opens an asynchronous database connection, and runs the
+    synchronous Alembic migration operations through run_sync().
+
+    The engine is disposed after the migration run completes.
+
+    """
+    connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
-    with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+    async with connectable.connect() as connection:
+        await connection.run_sync(do_run_migrations)
 
-        with context.begin_transaction():
-            context.run_migrations()
+    await connectable.dispose()
+
+
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode.
+
+    In this scenario an asynchronous Engine is created
+    and associated with the Alembic context.
+
+    The asynchronous migration runner is executed using
+    asyncio.run().
+
+    """
+    asyncio.run(run_async_migrations())
 
 
 if context.is_offline_mode():
