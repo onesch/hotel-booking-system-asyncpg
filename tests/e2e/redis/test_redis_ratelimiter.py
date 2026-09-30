@@ -8,7 +8,7 @@ from app.settings import settings
 async def test_rate_limit_blocks_after_max_requests(
     run_server,
 ):
-    url = f"http://127.0.0.1:8000/guests/"
+    url = "http://127.0.0.1:8000/guests/"
 
     async with httpx.AsyncClient() as client:
         # Requests within the limit must be allowed.
@@ -34,8 +34,8 @@ async def test_rate_limit_blocks_after_max_requests(
 async def test_health_endpoint_is_not_rate_limited(
     run_server,
 ):
-    health_url = f"http://127.0.0.1:8000/health"
-    guests_url = f"http://127.0.0.1:8000/guests/"
+    health_url = "http://127.0.0.1:8000/health"
+    guests_url = "http://127.0.0.1:8000/guests/"
 
     async with httpx.AsyncClient() as client:
         # Health requests must remain available beyond the normal limit.
