@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     max_requests: int = 10
     window_seconds: int = 60
 
+    # App settings
+    debug: bool = True
+
     model_config = SettingsConfigDict(
         env_file='.env',
         env_file_encoding='utf-8',

@@ -2,6 +2,7 @@ import asyncpg
 from typing import Any
 
 from app.settings import settings
+from app.logger_config import logger
 
 
 class Database:
@@ -25,15 +26,15 @@ class Database:
         try:
             conn = await asyncpg.connect(self.database_url)
 
-            print("Connection is alive.")
+            logger.info("Connection is alive.")
 
             version = await conn.fetchval("SELECT version();")
-            print(version)
+            logger.debug(version)
 
             return conn
 
         except asyncpg.exceptions.ClientConfigurationError as e:
-            print(f"Error connecting to the database: {e}")
+            logger.error(f"Error connecting to the database: {e}")
             raise
 
     async def close_connection(
@@ -44,7 +45,7 @@ class Database:
         Close an active database connection.
         """
         await conn.close()
-        print("Connection closed.")
+        logger.info("Connection closed.")
 
     async def fetch(
         self,

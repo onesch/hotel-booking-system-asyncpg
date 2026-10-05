@@ -4,6 +4,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.redis import redis
 from app.settings import settings
+from app.logger_config import logger
 
 
 RATE_LIMIT_SCRIPT = """
@@ -41,6 +42,13 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         # Block requests that exceed the configured limit.
         if current_count > settings.max_requests:
             ttl = await redis.ttl(key)
+
+            logger.warning(
+                "Rate limit exceeded for client %s: %s/%s requests",
+                client_ip,
+                current_count,
+                settings.max_requests,
+            )
 
             return JSONResponse(
                 status_code=429,
